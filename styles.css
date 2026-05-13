@@ -129,7 +129,7 @@ ol li::marker {
 
 .navbar {
   background: #27272A;
-  height: 52px;
+  height: 6vh;
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -158,3 +158,47 @@ ol li::marker {
 
 .navbar-link:hover  { background: rgba(255,255,255,0.08); color: #fff; }
 .navbar-link.active { background: rgba(255,255,255,0.10); color: #fff; }
+
+.container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.clickarea {
+	display: flex;
+	flex-direction: column;
+	/* flex-grow: 1; */
+	align-items: center;
+	justify-content: center;
+	height: 94vh;
+	width: 100vw;
+	color: white;
+	background-color: #4B88F2;
+	cursor: pointer;
+}
+
+.red {
+	background-color: #FF4D2B;
+}
+
+.green {
+	background-color: forestgreen;
+}
+
+.message {
+	margin: 1vh;
+	text-align: center;
+	-webkit-user-select: none;        
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	font-size: 9vh;
+}
+
+.note {
+	margin: 0;
+	text-align: center;
+	font-size: 2.8vh;
+}
