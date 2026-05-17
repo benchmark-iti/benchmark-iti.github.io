@@ -119,6 +119,7 @@ function onMatchStart(msg) {
     gameState = 'match_start'
     showGameSection()
     clearChat()
+    SFX.hideOverlay()
 
     scoreLabelYou.textContent = myUsername || 'Tú'
     scoreLabelOpp.textContent = msg.opponent
@@ -144,6 +145,7 @@ function onRoundStart(msg) {
 
 function onGo() {
     if (hasClicked) return  // already sent early_click this round
+    SFX.go()
     goTime = performance.now()
     gameState = 'round_active'
     setColor('green')
@@ -161,6 +163,9 @@ function onRoundResult(msg) {
     setColor(null)
     updateScore(msg.score.you, msg.score.opponent)
 
+    if (msg.won) { SFX.roundWin(); SFX.flashWin() }
+    else         { SFX.roundLose(); SFX.flashLose() }
+
     const wonText = msg.won ? '¡Ganaste esta ronda!' : 'Perdiste esta ronda'
     setMsg(wonText, `Tú: ${fmtMs(msg.yourMs)} — Oponente: ${fmtMs(msg.opponentMs)}`)
 }
@@ -171,10 +176,13 @@ function onMatchEnd(msg) {
     scoreRound.textContent = 'FIN'
 
     const sign = msg.eloChange >= 0 ? '+' : ''
+    const eloLine = `${sign}${msg.eloChange} ELO → ${msg.newElo}`
     const wonText = msg.won ? '¡Ganaste la partida!' : 'Perdiste la partida'
-    setMsg(wonText, `ELO: ${sign}${msg.eloChange} → ${msg.newElo}  ·  ${msg.score.you}–${msg.score.opponent}`)
+    setMsg(wonText, `ELO: ${eloLine}  ·  ${msg.score.you}–${msg.score.opponent}`)
 
-    // Show rematch/lobby buttons (rematch_available follows immediately from server)
+    if (msg.won) { SFX.matchWin(); SFX.startConfetti(); SFX.showOverlay(true,  eloLine) }
+    else         { SFX.matchLose();                     SFX.showOverlay(false, eloLine) }
+
     showRematchUI('available')
 }
 
@@ -184,9 +192,15 @@ function onOpponentDisconnected(msg) {
     scoreRound.textContent = 'FIN'
 
     const sign = msg.eloChange >= 0 ? '+' : ''
-    setMsg('Oponente desconectado', `Ganaste por abandono · ELO: ${sign}${msg.eloChange} → ${msg.newElo}`)
+    const eloLine = `${sign}${msg.eloChange} ELO → ${msg.newElo}`
+    setMsg('Oponente desconectado', `Ganaste por abandono · ELO: ${eloLine}`)
     addChatSystem('El oponente se desconectó.')
-    showRematchUI('gone') // no rematch when opponent disconnected
+
+    SFX.matchWin()
+    SFX.startConfetti()
+    SFX.showOverlay(true, eloLine)
+
+    showRematchUI('gone')
 }
 
 // ---- Rematch handlers ----
@@ -296,7 +310,6 @@ function requestRematch() {
     gameState = 'rematch_pending'
     ws.send(JSON.stringify({ type: 'rematch_request' }))
     showRematchUI('pending')
-    addChatSystem('Pediste la revancha...')
 }
 
 function acceptRematch() {
@@ -328,6 +341,8 @@ function handleAreaClick(e) {
     } else if (gameState === 'round_ready') {
         hasClicked = true
         ws.send(JSON.stringify({ type: 'early_click' }))
+        SFX.early()
+        SFX.shakeEarly()
         setColor(null)
         setMsg('¡Demasiado pronto!', 'Perdiste esta ronda')
     }

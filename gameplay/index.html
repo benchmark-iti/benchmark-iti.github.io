@@ -1,27 +1,316 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/jpeg" href="../assets/stopwatch.png">
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="icon" type="image/jpeg" href="/assets/stopwatch.png">
+    <link rel="stylesheet" href="/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Funcionamiento | ranked.ms</title>
+    <style>
+        .func-section {
+            margin-bottom: 40px;
+        }
+        .func-section h2 {
+            font-family: var(--font-cond);
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+        .func-section p {
+            color: var(--text-2);
+            line-height: 1.75;
+            margin-bottom: 10px;
+        }
+        .func-section strong { color: var(--text); }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .step-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            color: var(--text-2);
+            line-height: 1.6;
+            margin: 0;
+        }
+        .step-num {
+            flex-shrink: 0;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            font-family: var(--font-cond);
+            font-size: 13px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+        }
+
+        .callout-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .callout {
+            background: var(--surface-2);
+            border: 1px solid var(--border-2);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+        }
+        .callout-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-3);
+            margin-bottom: 4px;
+        }
+        .callout-value {
+            font-family: var(--font-cond);
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .callout-desc {
+            font-size: 12px;
+            color: var(--text-3);
+            margin-top: 2px;
+        }
+
+        .color-demo {
+            display: flex;
+            gap: 10px;
+            margin: 12px 0;
+            flex-wrap: wrap;
+        }
+        .color-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-2);
+        }
+        .color-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .tip-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .tip-list li {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            color: var(--text-2);
+            line-height: 1.6;
+            font-size: 13px;
+            margin: 0;
+        }
+        .tip-list li::before {
+            content: '→';
+            color: var(--accent);
+            flex-shrink: 0;
+            font-weight: 700;
+            margin-top: 1px;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
+        <a href="/" class="navbar-logo">ranked<span class="dot">.</span>ms</a>
         <div class="navbar-links">
-            <a href="/" class="navbar-link">Jugar</a>
-            <a href="/gameplay/" class="navbar-link">Funcionamiento</a>
+            <a href="/" class="navbar-link">Inicio</a>
+            <a href="/gameplay/" class="navbar-link active">Funcionamiento</a>
         </div>
     </nav>
 
     <div class="funcionamiento">
     <div class="funcionamiento-content">
-        <h1>Funcionamiento</h1>
-        <ol>
-        <li>El menor tiempo de respuesta gana</li>
-        <li>El primer jugador que gane 3 juegos seguidos gana la partida</li>
-        </ol>
+
+        <h1>Cómo jugar</h1>
+
+        <!-- QUÉ ES -->
+        <div class="func-section">
+            <h2>¿Qué es ranked.ms?</h2>
+            <p>
+                ranked.ms es un juego de <strong>tiempo de reacción</strong> en formato 1 contra 1. El objetivo es simple: cuando la pantalla se ponga verde, haz clic lo más rápido posible. El que reaccione antes gana la ronda.
+            </p>
+            <p>
+                Compite en partidas clasificatorias, sube tu ELO, y aparece en el ranking global.
+            </p>
+        </div>
+
+        <!-- UNA RONDA -->
+        <div class="func-section">
+            <h2>Una ronda, paso a paso</h2>
+            <ol class="step-list">
+                <li>
+                    <span class="step-num">1</span>
+                    <span>La pantalla se pone <strong>roja</strong>. Pon el dedo o el cursor encima y espera. Todavía no es momento.</span>
+                </li>
+                <li>
+                    <span class="step-num">2</span>
+                    <span>Después de un tiempo <strong>aleatorio</strong> (entre 2 y 5 segundos), la pantalla se vuelve <strong>verde</strong>. Ese es tu momento: ¡haz clic!</span>
+                </li>
+                <li>
+                    <span class="step-num">3</span>
+                    <span>El servidor mide ambos tiempos de reacción. <strong>El que haga clic primero gana la ronda</strong> y ve su tiempo en milisegundos.</span>
+                </li>
+            </ol>
+
+            <div class="color-demo">
+                <div class="color-chip">
+                    <div class="color-dot" style="background:#dc2626"></div>
+                    Rojo — espera, no hagas clic
+                </div>
+                <div class="color-chip">
+                    <div class="color-dot" style="background:#22c55e"></div>
+                    Verde — ¡haz clic ahora!
+                </div>
+                <div class="color-chip">
+                    <div class="color-dot" style="background:#18181f; border:1px solid #28283a"></div>
+                    Gris — entre rondas, espera
+                </div>
+            </div>
+        </div>
+
+        <!-- CLIC ANTICIPADO -->
+        <div class="func-section">
+            <h2>El clic anticipado</h2>
+            <p>
+                Si haces clic <strong>antes de que la pantalla se ponga verde</strong> (mientras aún está roja o gris), pierdes esa ronda automáticamente. No importa lo rápido que sea tu rival: el que hace trampa pierde.
+            </p>
+            <p>
+                El tiempo aleatorio existe precisamente para esto — memorizar el ritmo no sirve de nada.
+            </p>
+        </div>
+
+        <!-- UNA PARTIDA -->
+        <div class="func-section">
+            <h2>¿Cómo se gana la partida?</h2>
+            <p>
+                Una partida es al <strong>mejor de 5 rondas</strong>. El primero en ganar <strong>3 rondas</strong> gana la partida y se lleva los puntos ELO.
+            </p>
+
+            <div class="callout-row">
+                <div class="callout">
+                    <div class="callout-label">Rondas por partida</div>
+                    <div class="callout-value">5</div>
+                    <div class="callout-desc">Mejor de 5</div>
+                </div>
+                <div class="callout">
+                    <div class="callout-label">Para ganar</div>
+                    <div class="callout-value">3 rondas</div>
+                    <div class="callout-desc">Primero en llegar</div>
+                </div>
+                <div class="callout">
+                    <div class="callout-label">Tiempo límite / ronda</div>
+                    <div class="callout-value">10 s</div>
+                    <div class="callout-desc">Sin clic = timeout</div>
+                </div>
+            </div>
+
+            <p>
+                Si un jugador se desconecta durante la partida, el otro gana automáticamente y el ELO cambia como si hubiera terminado en ese momento.
+            </p>
+        </div>
+
+        <!-- MODOS -->
+        <div class="func-section">
+            <h2>Modos de juego</h2>
+
+            <p><strong>Buscar partida aleatoria</strong><br>
+            Entra a la cola de emparejamiento y el sistema te conectará con el primer jugador disponible de diferente cuenta. Es la forma más rápida de jugar.</p>
+
+            <p><strong>Sala privada</strong><br>
+            Crea una sala y comparte el código de 6 letras con quien quieras. La sala espera hasta que alguien se una con ese código y la partida arranca sola.</p>
+
+            <p><strong>Modo offline</strong><br>
+            Practica sin cuenta ni rival. Mide tu tiempo de reacción en solitario, sin presión y sin que afecte a tu ELO.</p>
+        </div>
+
+        <!-- ELO -->
+        <div class="func-section">
+            <h2>Sistema ELO</h2>
+            <p>
+                El ELO es tu <strong>puntuación de habilidad</strong>. Todos empiezan con <strong>1000 puntos</strong>. Ganas ELO al vencer rivales y pierdes al perder contra ellos.
+            </p>
+            <p>
+                La cantidad de puntos que ganas o pierdes depende de la diferencia de ELO: si vences a alguien mucho mejor que tú, ganarás más. Si pierdes contra alguien muy inferior, perderás más. El mínimo de ELO es siempre 0.
+            </p>
+
+            <div class="callout-row">
+                <div class="callout">
+                    <div class="callout-label">ELO inicial</div>
+                    <div class="callout-value">1000</div>
+                    <div class="callout-desc">Para todos</div>
+                </div>
+                <div class="callout">
+                    <div class="callout-label">Factor K</div>
+                    <div class="callout-value">32</div>
+                    <div class="callout-desc">Cambio máximo por partida</div>
+                </div>
+                <div class="callout">
+                    <div class="callout-label">ELO mínimo</div>
+                    <div class="callout-value">0</div>
+                    <div class="callout-desc">No baja de cero</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REVANCHA -->
+        <div class="func-section">
+            <h2>Revancha</h2>
+            <p>
+                Al terminar una partida, ambos jugadores tienen <strong>30 segundos</strong> para pedir la revancha. Si los dos aceptan, la partida vuelve a empezar inmediatamente en la misma sala, con el chat abierto. Si alguno rechaza o el tiempo se agota, la sala se cierra.
+            </p>
+        </div>
+
+        <!-- RANKINGS -->
+        <div class="func-section">
+            <h2>Rankings</h2>
+            <p>En la página principal hay tres tablas de clasificación:</p>
+            <ul class="tip-list">
+                <li><strong>ELO</strong> — los jugadores con más puntos de habilidad acumulados.</li>
+                <li><strong>Victorias</strong> — los jugadores con más partidas ganadas en total.</li>
+                <li><strong>Tiempo</strong> — las reacciones más rápidas registradas en partidas online (el modo offline no cuenta).</li>
+            </ul>
+        </div>
+
+        <!-- CONSEJOS -->
+        <div class="func-section">
+            <h2>Consejos para mejorar</h2>
+            <ul class="tip-list">
+                <li>Mantén el cursor o el dedo sobre la pantalla desde que empieza la cuenta atrás — moverlo tarda milisegundos extra.</li>
+                <li>No intentes anticiparte: el tiempo es aleatorio entre 2 y 5 segundos. Si haces clic antes, pierdes la ronda.</li>
+                <li>Un tiempo de reacción humano promedio es de unos <strong>200–250 ms</strong>. Por debajo de 180 ms ya estás por encima de la media.</li>
+                <li>La fatiga y las pantallas de alta frecuencia de actualización afectan tu tiempo. Un monitor de 144 Hz muestra el verde antes que uno de 60 Hz.</li>
+                <li>El modo offline es gratis para practicar sin arriesgar ELO.</li>
+            </ul>
+        </div>
+
     </div>
     </div>
 </body>

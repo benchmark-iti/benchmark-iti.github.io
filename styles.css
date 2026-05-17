@@ -703,6 +703,90 @@ li { margin-bottom: 16px; color: var(--text-2); line-height: 1.7; }
 ol li::marker { color: var(--accent); font-weight: 700; }
 
 /* ============================================================
+   MATCH RESULT OVERLAY
+   ============================================================ */
+.mro {
+  position: fixed;
+  inset: 0;
+  z-index: 850;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+}
+.mro.mro-show { animation: mro-enter 0.25s ease forwards; }
+.mro.mro-out  { animation: mro-exit  0.48s ease forwards; }
+
+.mro-win  { background: radial-gradient(ellipse at 50% 45%, rgba(34,197,94,.22) 0%, rgba(0,0,0,.55) 100%); }
+.mro-lose { background: radial-gradient(ellipse at 50% 45%, rgba(220,38,38,.18) 0%, rgba(0,0,0,.62) 100%); }
+
+.mro-inner {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.mro-title {
+  font-family: var(--font-cond);
+  font-size: clamp(62px, 13vw, 148px);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  opacity: 0;
+}
+.mro-win  .mro-title { color: var(--green); text-shadow: 0 0 100px rgba(34,197,94,.6);  animation: mro-bounce 0.55s cubic-bezier(.175,.885,.32,1.275) forwards; }
+.mro-lose .mro-title { color: #f87171;      text-shadow: 0 0 80px  rgba(248,113,113,.45); animation: mro-drop   0.42s ease-out forwards; }
+
+.mro-elo {
+  font-family: var(--font-mono);
+  font-size: clamp(16px, 3.5vw, 28px);
+  font-weight: 700;
+  opacity: 0;
+  animation: mro-elo-rise 0.35s ease 0.6s forwards;
+}
+.mro-win  .mro-elo { color: #86efac; }
+.mro-lose .mro-elo { color: #fca5a5; }
+
+@keyframes mro-enter    { to { opacity: 1; } }
+@keyframes mro-exit     { to { opacity: 0; } }
+@keyframes mro-bounce   { from { transform: scale(0.12); opacity: 0; } 65% { transform: scale(1.1); opacity: 1; } to { transform: scale(1); opacity: 1; } }
+@keyframes mro-drop     { from { transform: translateY(-55px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes mro-elo-rise { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* ============================================================
+   CLICKAREA VFX (flash + shake)
+   ============================================================ */
+.clickarea { position: relative; }
+
+.clickarea::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.clickarea.flash-win::after  { background: var(--green); animation: ca-flash-win  420ms ease-out forwards; }
+.clickarea.flash-lose::after { background: var(--red);   animation: ca-flash-lose 420ms ease-out forwards; }
+
+@keyframes ca-flash-win  { 0% { opacity: .52; } 100% { opacity: 0; } }
+@keyframes ca-flash-lose { 0% { opacity: 0; } 22% { opacity: .40; } 100% { opacity: 0; } }
+
+.clickarea.ca-shake { animation: ca-shake 360ms ease-out; }
+
+@keyframes ca-shake {
+  0%, 100% { transform: translateX(0); }
+  16%       { transform: translateX(-10px); }
+  34%       { transform: translateX(10px); }
+  52%       { transform: translateX(-7px); }
+  70%       { transform: translateX(7px); }
+  88%       { transform: translateX(-2px); }
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 768px) {
