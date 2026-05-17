@@ -9,8 +9,9 @@
 </head>
 <body>
     <nav class="navbar">
+        <a href="/" class="navbar-logo">ranked<span class="dot">.</span>ms</a>
         <div class="navbar-links">
-            <a href="/" class="navbar-link">Jugar</a>
+            <a href="/" class="navbar-link">Inicio</a>
             <a href="/gameplay/" class="navbar-link">Funcionamiento</a>
         </div>
         <div class="navbar-user" id="navUser"></div>
@@ -24,7 +25,7 @@
                 <p class="form-error" id="lobbyError"></p>
 
                 <div id="lobbyBtns" class="lobby-options">
-                    <button class="btn btn-green btn-block" onclick="findMatch()">
+                    <button class="btn btn-accent btn-block btn-lg" onclick="findMatch()">
                         Buscar partida aleatoria
                     </button>
                     <div class="lobby-divider">o</div>
@@ -47,7 +48,7 @@
                                placeholder="ABCD12" maxlength="6"
                                oninput="this.value=this.value.toUpperCase()"
                                onkeydown="if(event.key==='Enter')joinRoom()">
-                        <button class="btn btn-green" onclick="joinRoom()">Unirse</button>
+                        <button class="btn btn-accent" onclick="joinRoom()">Unirse</button>
                     </div>
                     <button class="btn btn-ghost btn-sm" onclick="hideJoin()">Cancelar</button>
                 </div>
@@ -73,19 +74,47 @@
                 <span class="score-name" id="scoreLabelYou">Tú</span>
                 <span class="score-num" id="scoreYou">0</span>
             </div>
-            <div class="score-vs">vs</div>
+            <div class="score-center">
+                <span class="score-vs">VS</span>
+                <span class="score-round" id="scoreRound"></span>
+            </div>
             <div class="score-side score-side-right">
                 <span class="score-num" id="scoreOpp">0</span>
                 <span class="score-name" id="scoreLabelOpp">Oponente</span>
             </div>
         </div>
-        <div class="container">
-            <div class="clickarea" id="gameArea">
-                <p class="message" id="gameMsg">Conectando...</p>
-                <p class="note" id="gameNote"></p>
-                <div id="gameActions" style="display:none; margin-top:20px">
-                    <button class="btn btn-green" onclick="backToLobby()">Jugar de nuevo</button>
-                    <a href="/" class="btn">Volver al inicio</a>
+
+        <div class="game-body">
+            <div class="container">
+                <div class="clickarea" id="gameArea">
+                    <p class="message" id="gameMsg">Conectando...</p>
+                    <p class="note" id="gameNote"></p>
+
+                    <!-- Match end / rematch actions -->
+                    <div id="gameActions" style="display:none; margin-top:28px; display:none">
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center">
+                            <button class="btn btn-outline btn-lg" id="btnRematch" onclick="requestRematch()">
+                                Revancha
+                            </button>
+                            <button class="btn btn-ghost" id="btnDecline" onclick="declineRematch()">
+                                Volver al lobby
+                            </button>
+                        </div>
+                        <p class="note" id="rematchNote" style="margin-top:12px"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHAT PANEL -->
+            <div class="chat-panel" id="chatPanel">
+                <div class="chat-header">Chat</div>
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="chat-input-row">
+                    <input class="chat-input" id="chatInput"
+                           placeholder="Mensaje..."
+                           maxlength="100"
+                           onkeydown="if(event.key==='Enter')sendChat()">
+                    <button class="btn btn-sm" onclick="sendChat()">&#x2192;</button>
                 </div>
             </div>
         </div>
@@ -94,7 +123,6 @@
     <script src="/js/config.js"></script>
     <script src="/js/auth.js"></script>
     <script>
-        // Render navbar user info
         const user = AUTH.getUser()
         if (user) {
             document.getElementById('navUser').innerHTML =

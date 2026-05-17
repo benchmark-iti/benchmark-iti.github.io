@@ -1,7 +1,8 @@
 let ws = null
 let goTime = null
-let gameState = 'lobby' // lobby | waiting_room | in_queue | match_start | round_ready | round_active | round_result | match_end
+let gameState = 'lobby' // lobby | waiting_room | in_queue | pre_match | match_start | round_ready | round_active | round_result | match_end | rematch_pending
 let hasClicked = false
+let myUsername = (AUTH.getUser() || {}).username || ''
 
 // ---- DOM refs ----
 
@@ -11,16 +12,22 @@ const gameArea      = document.getElementById('gameArea')
 const gameMsg       = document.getElementById('gameMsg')
 const gameNote      = document.getElementById('gameNote')
 const gameActions   = document.getElementById('gameActions')
+const btnRematch    = document.getElementById('btnRematch')
+const btnDecline    = document.getElementById('btnDecline')
+const rematchNote   = document.getElementById('rematchNote')
 const scoreYou      = document.getElementById('scoreYou')
 const scoreOpp      = document.getElementById('scoreOpp')
 const scoreLabelYou = document.getElementById('scoreLabelYou')
 const scoreLabelOpp = document.getElementById('scoreLabelOpp')
+const scoreRound    = document.getElementById('scoreRound')
 const lobbyError    = document.getElementById('lobbyError')
 const roomCreated   = document.getElementById('roomCreated')
 const roomCodeEl    = document.getElementById('roomCode')
 const inQueueEl     = document.getElementById('inQueue')
 const lobbyBtns     = document.getElementById('lobbyBtns')
 const joinPanel     = document.getElementById('joinPanel')
+const chatMessages  = document.getElementById('chatMessages')
+const chatInput     = document.getElementById('chatInput')
 
 // ---- Connection ----
 
@@ -55,23 +62,29 @@ function connect() {
 
 function handleMessage(msg) {
     switch (msg.type) {
-        case 'room_created':      onRoomCreated(msg); break
-        case 'opponent_joined':   onOpponentJoined(); break
-        case 'room_joined':       onRoomJoined(); break
-        case 'in_queue':          onInQueue(); break
-        case 'matched':           onMatched(); break
-        case 'match_start':       onMatchStart(msg); break
-        case 'round_start':       onRoundStart(msg); break
-        case 'go':                onGo(); break
-        case 'both_early':        onBothEarly(); break
-        case 'round_result':      onRoundResult(msg); break
-        case 'match_end':         onMatchEnd(msg); break
+        case 'room_created':          onRoomCreated(msg); break
+        case 'opponent_joined':       onOpponentJoined(); break
+        case 'room_joined':           onRoomJoined(); break
+        case 'in_queue':              onInQueue(); break
+        case 'matched':               onMatched(); break
+        case 'match_start':           onMatchStart(msg); break
+        case 'round_start':           onRoundStart(msg); break
+        case 'go':                    onGo(); break
+        case 'both_early':            onBothEarly(); break
+        case 'round_result':          onRoundResult(msg); break
+        case 'match_end':             onMatchEnd(msg); break
         case 'opponent_disconnected': onOpponentDisconnected(msg); break
-        case 'error':             setLobbyError(msg.message); break
+        case 'rematch_available':     onRematchAvailable(); break
+        case 'rematch_requested':     onRematchRequested(msg); break
+        case 'rematch_starting':      onRematchStarting(); break
+        case 'rematch_declined':      onRematchDeclined(); break
+        case 'rematch_timeout':       onRematchTimeout(); break
+        case 'chat':                  onChat(msg); break
+        case 'error':                 setLobbyError(msg.message); break
     }
 }
 
-// ---- Message handlers ----
+// ---- Game message handlers ----
 
 function onRoomCreated(msg) {
     gameState = 'waiting_room'
@@ -83,12 +96,10 @@ function onRoomCreated(msg) {
 }
 
 function onOpponentJoined() {
-    // Creator is notified that someone joined; match_start is coming
     roomCreated.querySelector('p').textContent = '¡Oponente encontrado!'
 }
 
 function onRoomJoined() {
-    // Joiner: match_start is coming immediately
     gameState = 'pre_match'
 }
 
@@ -101,22 +112,24 @@ function onInQueue() {
 }
 
 function onMatched() {
-    // Matchmaking found an opponent; match_start is coming
     gameState = 'pre_match'
 }
 
 function onMatchStart(msg) {
     gameState = 'match_start'
     showGameSection()
+    clearChat()
 
-    const user = AUTH.getUser()
-    scoreLabelYou.textContent = user ? user.username : 'Tú'
+    scoreLabelYou.textContent = myUsername || 'Tú'
     scoreLabelOpp.textContent = msg.opponent
     updateScore(0, 0)
+    scoreRound.textContent = ''
 
     setColor(null)
     setMsg(`vs ${msg.opponent}`, `Tu ELO: ${msg.yourElo} — Oponente: ${msg.opponentElo}`)
     gameActions.style.display = 'none'
+
+    addChatSystem(`Partida iniciada vs ${msg.opponent}`)
 }
 
 function onRoundStart(msg) {
@@ -125,11 +138,13 @@ function onRoundStart(msg) {
     setColor('red')
     setMsg(`Ronda ${msg.round}`, 'Espera al verde...')
     updateScore(msg.score.you, msg.score.opponent)
+    scoreRound.textContent = `RONDA ${msg.round}`
+    gameActions.style.display = 'none'
 }
 
 function onGo() {
+    if (hasClicked) return  // already sent early_click this round
     goTime = performance.now()
-    hasClicked = false
     gameState = 'round_active'
     setColor('green')
     setMsg('¡Click!', '')
@@ -153,20 +168,69 @@ function onRoundResult(msg) {
 function onMatchEnd(msg) {
     gameState = 'match_end'
     setColor(null)
+    scoreRound.textContent = 'FIN'
 
     const sign = msg.eloChange >= 0 ? '+' : ''
     const wonText = msg.won ? '¡Ganaste la partida!' : 'Perdiste la partida'
-    setMsg(wonText, `ELO: ${sign}${msg.eloChange} → ${msg.newElo}  |  ${msg.score.you}–${msg.score.opponent}`)
-    gameActions.style.display = ''
+    setMsg(wonText, `ELO: ${sign}${msg.eloChange} → ${msg.newElo}  ·  ${msg.score.you}–${msg.score.opponent}`)
+
+    // Show rematch/lobby buttons (rematch_available follows immediately from server)
+    showRematchUI('available')
 }
 
 function onOpponentDisconnected(msg) {
     gameState = 'match_end'
     setColor(null)
+    scoreRound.textContent = 'FIN'
 
     const sign = msg.eloChange >= 0 ? '+' : ''
-    setMsg('Oponente desconectado', `Ganaste por abandono | ELO: ${sign}${msg.eloChange} → ${msg.newElo}`)
-    gameActions.style.display = ''
+    setMsg('Oponente desconectado', `Ganaste por abandono · ELO: ${sign}${msg.eloChange} → ${msg.newElo}`)
+    addChatSystem('El oponente se desconectó.')
+    showRematchUI('gone') // no rematch when opponent disconnected
+}
+
+// ---- Rematch handlers ----
+
+function onRematchAvailable() {
+    // Already shown in onMatchEnd; just ensure state
+    if (gameState === 'match_end') {
+        showRematchUI('available')
+    }
+}
+
+function onRematchRequested(msg) {
+    addChatSystem(`${msg.from} quiere la revancha.`)
+    showRematchUI('accept')
+}
+
+function onRematchStarting() {
+    showRematchUI('starting')
+    addChatSystem('¡Revancha iniciando!')
+    setMsg('¡Revancha!', 'Preparate...')
+    // Match will reset; match_start arrives from server
+}
+
+function onRematchDeclined() {
+    addChatSystem('Revancha rechazada.')
+    showLobby()
+}
+
+function onRematchTimeout() {
+    addChatSystem('Tiempo de revancha agotado.')
+    showLobby()
+}
+
+// ---- Chat handler ----
+
+function onChat(msg) {
+    const isSelf = msg.from === myUsername
+    const row = document.createElement('div')
+    row.className = 'chat-msg'
+    row.innerHTML =
+        `<span class="chat-from${isSelf ? ' is-self' : ''}">${escapeHtml(msg.from)}</span>` +
+        `<span class="chat-text">${escapeHtml(msg.text)}</span>`
+    chatMessages.appendChild(row)
+    chatMessages.scrollTop = chatMessages.scrollHeight
 }
 
 // ---- User actions ----
@@ -219,9 +283,39 @@ function backToLobby() {
     showLobby()
 }
 
+function sendChat() {
+    const text = chatInput.value.trim()
+    if (!text || !wsReady()) return
+    ws.send(JSON.stringify({ type: 'chat', text }))
+    chatInput.value = ''
+    onChat({ from: myUsername, text })  // show immediately; server only relays to opponent
+}
+
+function requestRematch() {
+    if (!wsReady()) return
+    gameState = 'rematch_pending'
+    ws.send(JSON.stringify({ type: 'rematch_request' }))
+    showRematchUI('pending')
+    addChatSystem('Pediste la revancha...')
+}
+
+function acceptRematch() {
+    requestRematch()
+}
+
+function declineRematch() {
+    if (wsReady()) {
+        ws.send(JSON.stringify({ type: 'rematch_decline' }))
+    }
+    showLobby()
+}
+
 // ---- Click handler ----
 
 function handleAreaClick(e) {
+    // Let buttons, links, and inputs inside the area handle their own events
+    if (e.target.closest('button, a, input')) return
+
     e.preventDefault()
     e.stopPropagation()
     if (!wsReady() || hasClicked) return
@@ -245,7 +339,6 @@ function showLobby() {
     gameState = 'lobby'
     lobbySection.style.display = ''
     gameSection.style.display = 'none'
-    // Reset lobby to initial state
     lobbyBtns.style.display = ''
     joinPanel.style.display = 'none'
     roomCreated.style.display = 'none'
@@ -276,6 +369,61 @@ function updateScore(you, opp) {
 
 function setLobbyError(msg) {
     lobbyError.textContent = msg
+}
+
+// mode: 'available' | 'pending' | 'accept' | 'starting' | 'gone'
+function showRematchUI(mode) {
+    gameActions.style.display = ''
+    rematchNote.textContent = ''
+
+    if (mode === 'available') {
+        btnRematch.textContent = 'Revancha'
+        btnRematch.className = 'btn btn-outline btn-lg'
+        btnRematch.disabled = false
+        btnRematch.style.display = ''
+        btnRematch.onclick = requestRematch
+        btnDecline.textContent = 'Volver al lobby'
+        btnDecline.style.display = ''
+    } else if (mode === 'pending') {
+        btnRematch.textContent = 'Esperando...'
+        btnRematch.className = 'btn btn-lg'
+        btnRematch.disabled = true
+        btnDecline.textContent = 'Cancelar'
+        btnDecline.style.display = ''
+    } else if (mode === 'accept') {
+        btnRematch.textContent = 'Aceptar revancha'
+        btnRematch.className = 'btn btn-accent btn-lg'
+        btnRematch.disabled = false
+        btnRematch.onclick = acceptRematch
+        btnDecline.textContent = 'Rechazar'
+        btnDecline.style.display = ''
+    } else if (mode === 'starting') {
+        btnRematch.textContent = '¡Comenzando!'
+        btnRematch.className = 'btn btn-lg'
+        btnRematch.disabled = true
+        btnDecline.style.display = 'none'
+    } else if (mode === 'gone') {
+        // Opponent disconnected — no rematch
+        btnRematch.style.display = 'none'
+        btnDecline.textContent = 'Volver al lobby'
+        btnDecline.style.display = ''
+    }
+}
+
+function clearChat() {
+    chatMessages.innerHTML = ''
+}
+
+function addChatSystem(text) {
+    const el = document.createElement('div')
+    el.className = 'chat-system'
+    el.textContent = text
+    chatMessages.appendChild(el)
+    chatMessages.scrollTop = chatMessages.scrollHeight
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
 }
 
 function fmtMs(ms) {

@@ -9,8 +9,9 @@
 </head>
 <body>
     <nav class="navbar">
+        <a href="/" class="navbar-logo">ranked<span class="dot">.</span>ms</a>
         <div class="navbar-links">
-            <a href="/" class="navbar-link active">Jugar</a>
+            <a href="/" class="navbar-link active">Inicio</a>
             <a href="/gameplay/" class="navbar-link">Funcionamiento</a>
         </div>
         <div class="navbar-user" id="navUser"></div>
@@ -32,7 +33,7 @@
         <!-- Main content -->
         <main class="content">
             <a href="/game/offline.html" class="btn">Offline</a>
-            <a href="/game/online.html" class="btn btn-green">Online</a>
+            <a href="/game/online.html" class="btn btn-accent">Online</a>
         </main>
     </div>
 
@@ -48,7 +49,7 @@
         } else {
             document.getElementById('navUser').innerHTML =
                 `<a href="/login/" class="btn btn-sm">Entrar</a>
-                 <a href="/register/" class="btn btn-sm btn-green">Registrarse</a>`
+                 <a href="/register/" class="btn btn-sm btn-accent">Registrarse</a>`
         }
 
         // Leaderboard
