@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/jpeg" href="/assets/stopwatch.png">
+    <link rel="stylesheet" href="/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking | ranked.ms</title>
+    <style>
+        .ranking-page {
+            max-width: 540px;
+            margin: 0 auto;
+            padding: 24px 16px 48px;
+        }
+        .ranking-page h1 {
+            font-family: var(--font-cond);
+            font-size: 28px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text);
+            margin-bottom: 20px;
+        }
+        .ranking-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 0;
+        }
+        .ranking-tab {
+            flex: 1;
+            padding: 10px 4px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--text-3);
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            margin-bottom: -1px;
+            transition: color var(--t), border-color var(--t);
+        }
+        .ranking-tab:hover  { color: var(--text-2); }
+        .ranking-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        .ranking-list {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 var(--radius) var(--radius);
+            overflow: hidden;
+        }
+        .ranking-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            transition: background var(--t);
+        }
+        .ranking-row:last-child { border-bottom: none; }
+        .ranking-row:hover { background: var(--surface-2); }
+        .ranking-rank {
+            font-family: var(--font-cond);
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-3);
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .ranking-row:nth-child(1) .ranking-rank { color: #facc15; }
+        .ranking-row:nth-child(2) .ranking-rank { color: #94a3b8; }
+        .ranking-row:nth-child(3) .ranking-rank { color: #c2784b; }
+        .ranking-name {
+            flex: 1;
+            font-size: 14px;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .ranking-value {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+        .ranking-empty {
+            padding: 32px 16px;
+            text-align: center;
+            color: var(--text-3);
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-logo">ranked<span class="dot">.</span>ms</a>
+        <div class="navbar-links">
+            <a href="/" class="navbar-link">Inicio</a>
+            <a href="/ranking/" class="navbar-link active">Ranking</a>
+            <a href="/gameplay/" class="navbar-link">Cómo jugar</a>
+        </div>
+        <div class="navbar-user" id="navUser"></div>
+    </nav>
+
+    <div class="ranking-page">
+        <h1>Ranking</h1>
+
+        <div class="ranking-tabs">
+            <button class="ranking-tab active" onclick="loadRanking('elo', this)">ELO</button>
+            <button class="ranking-tab" onclick="loadRanking('wins', this)">Victorias</button>
+            <button class="ranking-tab" onclick="loadRanking('times', this)">Tiempo</button>
+        </div>
+        <div class="ranking-list" id="rankingList">
+            <div class="ranking-empty">Cargando...</div>
+        </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        const user = AUTH.getUser()
+        if (user) {
+            document.getElementById('navUser').innerHTML =
+                `<span class="navbar-username">${user.username}</span>
+                 <button class="btn btn-ghost btn-sm" onclick="AUTH.logout()">Salir</button>`
+        } else {
+            document.getElementById('navUser').innerHTML =
+                `<a href="/login/" class="btn btn-sm">Entrar</a>
+                 <a href="/register/" class="btn btn-sm btn-accent">Registrarse</a>`
+        }
+
+        const suffix = { elo: 'ELO', wins: 'vic.', times: 'ms' }
+
+        async function loadRanking(type, btn) {
+            document.querySelectorAll('.ranking-tab').forEach(t => t.classList.remove('active'))
+            if (btn) btn.classList.add('active')
+
+            const list = document.getElementById('rankingList')
+            list.innerHTML = '<div class="ranking-empty">Cargando...</div>'
+
+            try {
+                const res = await fetch(`${CONFIG.backendUrl}/api/leaderboard/${type}`)
+                if (!res.ok) throw new Error()
+                const data = await res.json()
+
+                if (!data || !data.length) {
+                    list.innerHTML = '<div class="ranking-empty">Sin datos aún</div>'
+                    return
+                }
+
+                list.innerHTML = data.map(e => `
+                    <div class="ranking-row">
+                        <span class="ranking-rank">${e.rank}</span>
+                        <span class="ranking-name">${e.username}</span>
+                        <span class="ranking-value">${e.value} ${suffix[type]}</span>
+                    </div>`).join('')
+            } catch {
+                list.innerHTML = '<div class="ranking-empty">Error al cargar</div>'
+            }
+        }
+
+        loadRanking('elo', null)
+    </script>
+</body>
+</html>
