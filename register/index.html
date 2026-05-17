@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/jpeg" href="/assets/stopwatch.png">
+    <link rel="stylesheet" href="/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse | ranked.ms</title>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-links">
+            <a href="/" class="navbar-link">Jugar</a>
+            <a href="/gameplay/" class="navbar-link">Funcionamiento</a>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2 class="auth-title">Crear cuenta</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label class="form-label">Usuario <span class="form-hint">(3–32 caracteres)</span></label>
+                    <input class="form-input" type="text" id="username" autocomplete="username" minlength="3" maxlength="32" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Contraseña <span class="form-hint">(mín. 6 caracteres)</span></label>
+                    <input class="form-input" type="password" id="password" autocomplete="new-password" minlength="6" required>
+                </div>
+                <p class="form-error" id="errorMsg"></p>
+                <button class="btn btn-block btn-green" type="submit" id="submitBtn">Registrarse</button>
+            </form>
+            <p class="auth-footer">
+                ¿Ya tienes cuenta? <a href="/login/">Inicia sesión</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        if (AUTH.isLoggedIn()) window.location.href = '/'
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault()
+            const btn = document.getElementById('submitBtn')
+            const err = document.getElementById('errorMsg')
+            btn.disabled = true
+            err.textContent = ''
+
+            try {
+                const res = await fetch(`${CONFIG.backendUrl}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value,
+                        password: document.getElementById('password').value,
+                    }),
+                })
+                if (!res.ok) {
+                    err.textContent = await res.text()
+                    return
+                }
+                const data = await res.json()
+                AUTH.save(data.token, data.username)
+                window.location.href = '/'
+            } catch {
+                err.textContent = 'Error de conexión'
+            } finally {
+                btn.disabled = false
+            }
+        })
+    </script>
+</body>
+</html>

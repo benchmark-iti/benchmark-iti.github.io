@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/jpeg" href="/assets/stopwatch.png">
+    <link rel="stylesheet" href="/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online | ranked.ms</title>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-links">
+            <a href="/" class="navbar-link">Jugar</a>
+            <a href="/gameplay/" class="navbar-link">Funcionamiento</a>
+        </div>
+        <div class="navbar-user" id="navUser"></div>
+    </nav>
+
+    <!-- LOBBY SECTION -->
+    <div id="lobbySection">
+        <div class="lobby-container">
+            <div class="lobby-card">
+                <h2 class="lobby-title">Online 1v1</h2>
+                <p class="form-error" id="lobbyError"></p>
+
+                <div id="lobbyBtns" class="lobby-options">
+                    <button class="btn btn-green btn-block" onclick="findMatch()">
+                        Buscar partida aleatoria
+                    </button>
+                    <div class="lobby-divider">o</div>
+                    <button class="btn btn-block" onclick="createRoom()">Crear sala privada</button>
+                    <button class="btn btn-block" onclick="showJoin()">Unirse con código</button>
+                </div>
+
+                <!-- Room created: show code -->
+                <div id="roomCreated" style="display:none">
+                    <p class="lobby-waiting-label">Sala creada — comparte el código:</p>
+                    <div class="room-code-display" id="roomCode"></div>
+                    <p class="form-hint" style="text-align:center">Esperando a que alguien se una...</p>
+                    <button class="btn btn-ghost btn-sm" onclick="cancelWait()">Cancelar</button>
+                </div>
+
+                <!-- Join form -->
+                <div id="joinPanel" style="display:none">
+                    <div class="join-row">
+                        <input class="form-input" type="text" id="roomCodeInput"
+                               placeholder="ABCD12" maxlength="6"
+                               oninput="this.value=this.value.toUpperCase()"
+                               onkeydown="if(event.key==='Enter')joinRoom()">
+                        <button class="btn btn-green" onclick="joinRoom()">Unirse</button>
+                    </div>
+                    <button class="btn btn-ghost btn-sm" onclick="hideJoin()">Cancelar</button>
+                </div>
+
+                <!-- In queue indicator -->
+                <div id="inQueue" style="display:none">
+                    <div class="searching">
+                        <span class="searching-dot"></span>
+                        <span class="searching-dot"></span>
+                        <span class="searching-dot"></span>
+                        Buscando oponente...
+                    </div>
+                    <button class="btn btn-ghost btn-sm" onclick="cancelQueue()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME SECTION -->
+    <div id="gameSection" style="display:none">
+        <div class="score-bar">
+            <div class="score-side">
+                <span class="score-name" id="scoreLabelYou">Tú</span>
+                <span class="score-num" id="scoreYou">0</span>
+            </div>
+            <div class="score-vs">vs</div>
+            <div class="score-side score-side-right">
+                <span class="score-num" id="scoreOpp">0</span>
+                <span class="score-name" id="scoreLabelOpp">Oponente</span>
+            </div>
+        </div>
+        <div class="container">
+            <div class="clickarea" id="gameArea">
+                <p class="message" id="gameMsg">Conectando...</p>
+                <p class="note" id="gameNote"></p>
+                <div id="gameActions" style="display:none; margin-top:20px">
+                    <button class="btn btn-green" onclick="backToLobby()">Jugar de nuevo</button>
+                    <a href="/" class="btn">Volver al inicio</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        // Render navbar user info
+        const user = AUTH.getUser()
+        if (user) {
+            document.getElementById('navUser').innerHTML =
+                `<span class="navbar-username">${user.username}</span>
+                 <button class="btn btn-ghost btn-sm" onclick="AUTH.logout()">Salir</button>`
+        } else {
+            document.getElementById('navUser').innerHTML =
+                `<a href="/login/" class="btn btn-sm">Entrar</a>`
+        }
+    </script>
+    <script src="online.js"></script>
+</body>
+</html>

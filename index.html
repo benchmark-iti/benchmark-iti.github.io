@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/jpeg" href="assets/stopwatch.png">
@@ -10,26 +10,79 @@
 <body>
     <nav class="navbar">
         <div class="navbar-links">
-            <a href="/" class="navbar-link">Jugar</a>
+            <a href="/" class="navbar-link active">Jugar</a>
             <a href="/gameplay/" class="navbar-link">Funcionamiento</a>
         </div>
+        <div class="navbar-user" id="navUser"></div>
     </nav>
 
     <div class="layout">
+        <!-- Leaderboard sidebar -->
         <div class="sidebar">
-            <div class="sidebar-title">Tiempos más rápidos (ms)</div>
-            <div class="lb-row">
-                <span class="lb-rank">1</span>
-                <span class="lb-name">test</span>
-                <span class="lb-time">140</span>
+            <div class="lb-tabs">
+                <button class="lb-tab active" onclick="loadLb('elo', this)">ELO</button>
+                <button class="lb-tab" onclick="loadLb('wins', this)">Victorias</button>
+                <button class="lb-tab" onclick="loadLb('times', this)">Tiempo</button>
+            </div>
+            <div id="lbList">
+                <div class="lb-loading">Cargando...</div>
             </div>
         </div>
+
+        <!-- Main content -->
         <main class="content">
             <a href="/game/offline.html" class="btn">Offline</a>
-            <a href="#" class="btn" style="background-color: #5baa00; color: #fff;">
-                Online
-            </a>
+            <a href="/game/online.html" class="btn btn-green">Online</a>
         </main>
     </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        // Navbar
+        const user = AUTH.getUser()
+        if (user) {
+            document.getElementById('navUser').innerHTML =
+                `<span class="navbar-username">${user.username}</span>
+                 <button class="btn btn-ghost btn-sm" onclick="AUTH.logout()">Salir</button>`
+        } else {
+            document.getElementById('navUser').innerHTML =
+                `<a href="/login/" class="btn btn-sm">Entrar</a>
+                 <a href="/register/" class="btn btn-sm btn-green">Registrarse</a>`
+        }
+
+        // Leaderboard
+        const lbSuffix = { elo: 'ELO', wins: 'vic.', times: 'ms' }
+
+        async function loadLb(type, btn) {
+            document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'))
+            if (btn) btn.classList.add('active')
+
+            const list = document.getElementById('lbList')
+            list.innerHTML = '<div class="lb-loading">Cargando...</div>'
+
+            try {
+                const res = await fetch(`${CONFIG.backendUrl}/api/leaderboard/${type}`)
+                if (!res.ok) throw new Error()
+                const data = await res.json()
+
+                if (!data.length) {
+                    list.innerHTML = '<div class="lb-loading">Sin datos aún</div>'
+                    return
+                }
+
+                list.innerHTML = data.map(e => `
+                    <div class="lb-row">
+                        <span class="lb-rank">${e.rank}</span>
+                        <span class="lb-name">${e.username}</span>
+                        <span class="lb-time">${e.value} ${lbSuffix[type]}</span>
+                    </div>`).join('')
+            } catch {
+                list.innerHTML = '<div class="lb-loading">Error al cargar</div>'
+            }
+        }
+
+        loadLb('elo', null)
+    </script>
 </body>
 </html>

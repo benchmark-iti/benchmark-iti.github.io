@@ -175,16 +175,16 @@ ol li::marker {
 	height: 94vh;
 	width: 100vw;
 	color: white;
-	background-color: #4B88F2;
+	background-color: #684583;
 	cursor: pointer;
 }
 
 .red {
-	background-color: #FF4D2B;
+	background-color: #DFC39C;
 }
 
 .green {
-	background-color: forestgreen;
+	background-color: #6DA155;
 }
 
 .message {
@@ -201,4 +201,276 @@ ol li::marker {
 	margin: 0;
 	text-align: center;
 	font-size: 2.8vh;
+}
+
+/* ---- Buttons ---- */
+
+.btn-green {
+  background: #3a7d44;
+  border-color: #4caf78;
+  color: #fff;
+}
+.btn-green:hover { background: #4a9d54; color: #fff; }
+
+.btn-ghost {
+  background: transparent;
+  border-color: #3f3f46;
+  color: #888;
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.06); color: #ccc; }
+
+.btn-block { display: block; width: 100%; text-align: center; cursor: pointer; }
+
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+
+button.btn { cursor: pointer; }
+
+/* ---- Navbar user area ---- */
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-username {
+  font-size: 13px;
+  color: #aaa;
+}
+
+/* ---- Leaderboard tabs ---- */
+
+.lb-tabs {
+  display: flex;
+  border-bottom: 1px solid #2a2a2e;
+}
+
+.lb-tab {
+  flex: 1;
+  padding: 10px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #666;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  margin-bottom: -1px;
+}
+
+.lb-tab:hover { color: #aaa; }
+.lb-tab.active { color: #4caf78; border-bottom-color: #4caf78; }
+
+.lb-loading {
+  padding: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #555;
+}
+
+/* ---- Auth forms ---- */
+
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.auth-card {
+  background: #09090b;
+  border: 1px solid #2a2a2e;
+  border-radius: 10px;
+  padding: 32px 36px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.auth-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e0e0e0;
+  margin-bottom: 24px;
+}
+
+.form-group { margin-bottom: 16px; }
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 6px;
+}
+
+.form-hint { font-size: 11px; color: #555; }
+
+.form-input {
+  width: 100%;
+  padding: 9px 12px;
+  background: #18181b;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.form-input:focus { border-color: #4caf78; }
+
+.form-error {
+  font-size: 13px;
+  color: #f87171;
+  min-height: 18px;
+  margin-bottom: 12px;
+}
+
+.auth-footer {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+}
+.auth-footer a { color: #4caf78; text-decoration: none; }
+.auth-footer a:hover { text-decoration: underline; }
+
+/* ---- Online lobby ---- */
+
+.lobby-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: calc(94vh);
+}
+
+.lobby-card {
+  background: #09090b;
+  border: 1px solid #2a2a2e;
+  border-radius: 10px;
+  padding: 32px 36px;
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lobby-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e0e0e0;
+  margin-bottom: 4px;
+}
+
+.lobby-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lobby-divider {
+  text-align: center;
+  font-size: 12px;
+  color: #444;
+}
+
+.room-code-display {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-align: center;
+  color: #4caf78;
+  padding: 12px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.lobby-waiting-label {
+  font-size: 13px;
+  color: #888;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.join-row {
+  display: flex;
+  gap: 8px;
+}
+.join-row .form-input { flex: 1; text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* ---- Searching animation ---- */
+
+.searching {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #aaa;
+  padding: 8px 0;
+}
+
+.searching-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4caf78;
+  animation: bounce 1.2s infinite ease-in-out;
+}
+.searching-dot:nth-child(2) { animation-delay: 0.2s; }
+.searching-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40%            { transform: scale(1.0); opacity: 1; }
+}
+
+/* ---- Score bar (online game) ---- */
+
+.score-bar {
+  height: 6vh;
+  background: #09090b;
+  border-bottom: 1px solid #2a2a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 0 20px;
+}
+
+.score-side {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.score-side-right { flex-direction: row-reverse; }
+
+.score-name {
+  font-size: 13px;
+  color: #888;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.score-num {
+  font-size: 28px;
+  font-weight: 800;
+  color: #e0e0e0;
+  font-variant-numeric: tabular-nums;
+  min-width: 24px;
+  text-align: center;
+}
+
+.score-vs {
+  font-size: 12px;
+  color: #444;
+}
+
+/* Adjust clickarea height when score bar is visible */
+#gameSection .clickarea {
+  height: 88vh;
 }
