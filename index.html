@@ -31,10 +31,39 @@
             </div>
         </div>
 
-        <!-- Main content -->
+        <!-- Main hero -->
         <main class="content">
-            <a href="/game/offline.html" class="btn">Offline</a>
-            <a href="/game/online.html" class="btn btn-accent">Online</a>
+            <div class="hero">
+                <p class="hero-eyebrow">Tiempo de reacción &middot; 1 vs 1</p>
+                <h1 class="hero-title">ranked<span class="dot">.</span>ms</h1>
+                <p class="hero-tagline">
+                    Compite en tiempo real contra otro jugador.<br>
+                    El más rápido al milisegundo gana. Sube en el ELO. Bate récords.
+                </p>
+
+                <div class="hero-stats" id="heroStats">
+                    <div class="hero-stat">
+                        <span class="hero-stat-label">Top ELO</span>
+                        <span class="hero-stat-value" id="statEloVal">—</span>
+                        <span class="hero-stat-who" id="statEloWho">cargando</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-label">Victorias</span>
+                        <span class="hero-stat-value" id="statWinsVal">—</span>
+                        <span class="hero-stat-who" id="statWinsWho">cargando</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-label">Récord</span>
+                        <span class="hero-stat-value" id="statTimeVal">—</span>
+                        <span class="hero-stat-who" id="statTimeWho">cargando</span>
+                    </div>
+                </div>
+
+                <div class="hero-actions">
+                    <a href="/game/online.html" class="btn btn-accent btn-xl">Jugar Online</a>
+                    <a href="/game/offline.html" class="btn btn-xl">Práctica</a>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -53,8 +82,9 @@
                  <a href="/register/" class="btn btn-sm btn-accent">Registrarse</a>`
         }
 
-        // Leaderboard
+        // Leaderboard sidebar
         const lbSuffix = { elo: 'ELO', wins: 'vic.', times: 'ms' }
+        const medalClass = n => n === 1 ? 'lb-rank-1' : n === 2 ? 'lb-rank-2' : n === 3 ? 'lb-rank-3' : ''
 
         async function loadLb(type, btn) {
             document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'))
@@ -75,7 +105,7 @@
 
                 list.innerHTML = data.map(e => `
                     <div class="lb-row">
-                        <span class="lb-rank">${e.rank}</span>
+                        <span class="lb-rank ${medalClass(e.rank)}">${e.rank}</span>
                         <span class="lb-name">${e.username}</span>
                         <span class="lb-time">${e.value} ${lbSuffix[type]}</span>
                     </div>`).join('')
@@ -84,7 +114,23 @@
             }
         }
 
+        // Hero stats: top #1 from each board
+        async function loadHeroStats() {
+            const dash = (id) => document.getElementById(id)
+            try {
+                const [elo, wins, times] = await Promise.all([
+                    fetch(`${CONFIG.backendUrl}/api/leaderboard/elo`).then(r => r.json()),
+                    fetch(`${CONFIG.backendUrl}/api/leaderboard/wins`).then(r => r.json()),
+                    fetch(`${CONFIG.backendUrl}/api/leaderboard/times`).then(r => r.json()),
+                ])
+                if (elo && elo[0])   { dash('statEloVal').textContent = elo[0].value + ' ELO';   dash('statEloWho').textContent  = elo[0].username }
+                if (wins && wins[0]) { dash('statWinsVal').textContent = wins[0].value + ' vic.'; dash('statWinsWho').textContent = wins[0].username }
+                if (times && times[0]) { dash('statTimeVal').textContent = times[0].value + ' ms'; dash('statTimeWho').textContent = times[0].username }
+            } catch {}
+        }
+
         loadLb('elo', null)
+        loadHeroStats()
     </script>
 </body>
 </html>

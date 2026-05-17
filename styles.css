@@ -787,6 +787,103 @@ ol li::marker { color: var(--accent); font-weight: 700; }
 }
 
 /* ============================================================
+   HOME HERO
+   ============================================================ */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0 52px;
+  max-width: 620px;
+  width: 100%;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-cond);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.hero-title {
+  font-family: var(--font-cond);
+  font-size: 88px;
+  font-weight: 800;
+  line-height: 0.88;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+.hero-title .dot { color: var(--accent); }
+
+.hero-tagline {
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.65;
+  max-width: 360px;
+  margin-bottom: 36px;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 32px;
+  width: 100%;
+  max-width: 440px;
+}
+
+.hero-stat {
+  flex: 1;
+  background: var(--surface);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.hero-stat-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.hero-stat-value {
+  font-family: var(--font-cond);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.hero-stat-who {
+  font-size: 11px;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-actions { display: flex; gap: 10px; align-items: center; }
+
+.btn-xl { padding: 13px 32px; font-size: 15px; font-weight: 700; }
+
+/* Medal colors for top 3 sidebar rows */
+.lb-rank-1 { color: #facc15 !important; }
+.lb-rank-2 { color: #94a3b8 !important; }
+.lb-rank-3 { color: #c2784b !important; }
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 768px) {
@@ -826,4 +923,13 @@ ol li::marker { color: var(--accent); font-weight: 700; }
   #gameActions .btn, #rematchUI .btn { width: 220px; }
 
   .navbar-logo { font-size: 17px; }
+
+  .hero { padding: 32px 20px; max-width: 100%; }
+  .hero-title { font-size: 60px; }
+  .hero-tagline { font-size: 14px; margin-bottom: 24px; }
+  .hero-stats { max-width: 100%; margin-bottom: 24px; }
+  .hero-stat-value { font-size: 22px; }
+  .hero-actions { flex-direction: column; width: 100%; }
+  .hero-actions .btn { width: 100%; justify-content: center; }
+  .btn-xl { padding: 13px 24px; }
 }
