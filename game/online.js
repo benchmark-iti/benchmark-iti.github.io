@@ -387,6 +387,18 @@ function handleAreaClick(e) {
     if (gameState === 'round_active') {
         hasClicked = true
         const ms = Math.round(performance.now() - goTime)
+        // Sub-100ms es físicamente imposible para reacción humana. El
+        // servidor también lo valida (lo trata como early), pero lo
+        // detectamos aquí para dar feedback inmediato sin esperar el
+        // round-trip.
+        if (ms < 100) {
+            ws.send(JSON.stringify({ type: 'early_click' }))
+            SFX.early()
+            SFX.shakeEarly()
+            setColor(null)
+            setMsg('¡Demasiado pronto!', 'Perdiste esta ronda')
+            return
+        }
         ws.send(JSON.stringify({ type: 'reaction', ms }))
         setMsg('...', '')
     } else if (gameState === 'round_ready') {

@@ -27,6 +27,12 @@ const updateText = (messageText, noteText) => {
    note.textContent = noteText
 }
 
+// MIN_REACTION_MS es el tiempo de reacción mínimo creíble para un humano.
+// Estudios sitúan el mínimo de reacción visual + clic del ratón alrededor
+// de los 100ms — cualquier valor por debajo es prácticamente imposible y se
+// considera "anticipación" (early click).
+const MIN_REACTION_MS = 100
+
 // handleClick maneja AMBOS clicks: el de inicio (pone rojo + programa verde)
 // y el de reacción (mide tiempo o detecta early). preventDefault y
 // stopPropagation se llaman porque mousedown + touchstart pueden dispararse
@@ -52,14 +58,21 @@ const handleClick = event => {
    } else {
       testStarted = false
 
-      if (new Date() < finishTime) {
+      const elapsed = new Date() - finishTime
+
+      if (elapsed < 0) {
+         // Clickeó antes del verde — anticipación clara.
          clearTimeout(timer)
          clickarea.classList.remove('red')
          updateText('¡Demasiado pronto!', 'Click para intentar de nuevo')
-
+      } else if (elapsed < MIN_REACTION_MS) {
+         // Clickeó después del verde pero en menos de 100ms — humanamente
+         // imposible, así que también cuenta como anticipación.
+         clickarea.classList.remove('green')
+         updateText('¡Demasiado pronto!', 'Reacción imposible (<100ms). Click para reintentar')
       } else {
          clickarea.classList.remove('green')
-         updateText(`${new Date() - finishTime}ms`, 'Click para seguir')
+         updateText(`${elapsed}ms`, 'Click para seguir')
       }
    }
 }
