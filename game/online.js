@@ -1,7 +1,30 @@
+// online.js — Cliente del modo 1v1 online.
+//
+// Arquitectura:
+//   - Una conexión WebSocket persistente al backend (autenticada por JWT
+//     en query param).
+//   - El servidor maneja TODA la lógica de juego (timing, score, ELO);
+//     el cliente solo refleja el estado actual y reporta clicks.
+//   - `gameState` es la máquina de estados del cliente. Determina cómo
+//     interpretar los clicks en el gameArea y qué mostrar.
+//   - Los mensajes del servidor llegan en handleMessage → onXxx handler.
+//
+// Estados de gameState:
+//   lobby           → menú principal, sin conexión activa al juego
+//   waiting_room    → creó sala privada, esperando que alguien entre
+//   in_queue        → matchmaking en cola
+//   pre_match       → emparejado, esperando match_start
+//   match_start     → partida iniciada (transición)
+//   round_ready     → pantalla roja, esperando verde
+//   round_active    → pantalla verde, click cuenta
+//   round_result    → mostrando ganador de la ronda
+//   match_end       → mostrando resultado final + opciones de revancha
+//   rematch_pending → pidió revancha, esperando al oponente
+
 let ws = null
-let goTime = null
-let gameState = 'lobby' // lobby | waiting_room | in_queue | pre_match | match_start | round_ready | round_active | round_result | match_end | rematch_pending
-let hasClicked = false
+let goTime = null  // performance.now() del momento en que llegó "go"
+let gameState = 'lobby'
+let hasClicked = false  // dentro de una ronda, ¿ya envió reaction o early?
 let myUsername = (AUTH.getUser() || {}).username || ''
 
 // ---- DOM refs ----
@@ -31,6 +54,10 @@ const chatInput     = document.getElementById('chatInput')
 
 // ---- Connection ----
 
+// connect abre la conexión WebSocket al backend. El JWT va como query
+// param porque la API WebSocket del browser no permite headers custom
+// en el handshake. Si la conexión se pierde durante una partida, se
+// muestra un mensaje y se reintenta tras 2.5s.
 function connect() {
     if (!AUTH.requireLogin()) return
 
@@ -60,6 +87,9 @@ function connect() {
 
 // ---- Message router ----
 
+// handleMessage es el router central de mensajes del servidor.
+// Cada mensaje tiene un `type` que determina el handler. Los handlers
+// onXxx actualizan gameState, renderean UI y disparan efectos (SFX).
 function handleMessage(msg) {
     switch (msg.type) {
         case 'room_created':          onRoomCreated(msg); break
@@ -143,8 +173,16 @@ function onRoundStart(msg) {
     gameActions.style.display = 'none'
 }
 
+// onGo es CRÍTICO: marca el inicio de la ventana de reacción.
+// goTime se usa luego en handleAreaClick para calcular el delta.
+// performance.now() es preferible a Date.now() porque tiene mejor resolución
+// (sub-ms) y no se ve afectado por ajustes del reloj del sistema.
+//
+// Si el cliente ya hizo early click en esta ronda, ignoramos el go (no se
+// pone verde ni se reproduce el sonido) — el servidor ya sabe que esta
+// ronda terminó para este jugador.
 function onGo() {
-    if (hasClicked) return  // already sent early_click this round
+    if (hasClicked) return
     SFX.go()
     goTime = performance.now()
     gameState = 'round_active'
@@ -297,12 +335,16 @@ function backToLobby() {
     showLobby()
 }
 
+// sendChat manda el mensaje al servidor Y lo muestra localmente. El
+// servidor solo lo reenvía al OTRO jugador para evitar duplicados.
+// Mostrarlo local hace que el chat se sienta instantáneo aunque la
+// conexión tenga latencia.
 function sendChat() {
     const text = chatInput.value.trim()
     if (!text || !wsReady()) return
     ws.send(JSON.stringify({ type: 'chat', text }))
     chatInput.value = ''
-    onChat({ from: myUsername, text })  // show immediately; server only relays to opponent
+    onChat({ from: myUsername, text })
 }
 
 function requestRematch() {
@@ -325,8 +367,17 @@ function declineRematch() {
 
 // ---- Click handler ----
 
+// handleAreaClick es el corazón del input del juego. Es el handler de
+// mousedown y touchstart en el gameArea (todo el div grande).
+//
+// Detalles:
+//  - El `closest('button, a, input')` es CRÍTICO: el gameArea contiene
+//    los botones de revancha y chat. Sin este check, preventDefault
+//    bloquearía los clicks en esos botones (especialmente en móvil donde
+//    preventDefault en touchstart suprime el click sintético).
+//  - hasClicked previene doble envío en una misma ronda.
+//  - Solo round_active y round_ready aceptan click; otros estados lo ignoran.
 function handleAreaClick(e) {
-    // Let buttons, links, and inputs inside the area handle their own events
     if (e.target.closest('button, a, input')) return
 
     e.preventDefault()
@@ -386,6 +437,13 @@ function setLobbyError(msg) {
     lobbyError.textContent = msg
 }
 
+// showRematchUI muestra los botones de fin de partida según el estado:
+//   available → "Revancha" + "Volver al lobby"   (estado inicial)
+//   pending   → "Esperando..."                    (yo pedí, espero al rival)
+//   accept    → "Aceptar revancha" + "Rechazar"   (rival pidió, espero mi decisión)
+//   starting  → "¡Comenzando!"                    (ambos aceptaron, pausa antes de empezar)
+//   gone      → solo "Volver al lobby"            (rival se desconectó, no hay revancha)
+//
 // mode: 'available' | 'pending' | 'accept' | 'starting' | 'gone'
 function showRematchUI(mode) {
     gameActions.style.display = ''

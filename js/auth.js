@@ -1,3 +1,11 @@
+// AUTH es el módulo de autenticación del cliente. Persiste el token JWT
+// y los datos del usuario en localStorage (no en cookies — el backend no
+// usa cookies, solo Bearer tokens y query param para WS).
+//
+// El token sobrevive entre pestañas y reloads, pero se borra si el usuario
+// hace logout o si el navegador limpia el localStorage. No hay renovación
+// automática: cuando el JWT expira (30 días), el usuario tiene que volver
+// a hacer login.
 const AUTH = {
     getToken() {
         return localStorage.getItem('rankedms_token')
@@ -25,6 +33,9 @@ const AUTH = {
         return !!this.getToken()
     },
 
+    // requireLogin redirige a /login/ si el usuario no está autenticado.
+    // Devuelve false en ese caso para que el caller pueda abortar (ej.
+    // online.js lo usa antes de intentar conectar al WS).
     requireLogin() {
         if (!this.isLoggedIn()) {
             window.location.href = '/login/'
@@ -33,6 +44,9 @@ const AUTH = {
         return true
     },
 
+    // fetchMe obtiene los datos actualizados del usuario (ELO, wins, losses,
+    // mejor tiempo) desde /api/me. El JWT solo trae username + UserID, así
+    // que para mostrar el ELO actual hay que pegarle a la API.
     async fetchMe() {
         const token = this.getToken()
         if (!token) return null

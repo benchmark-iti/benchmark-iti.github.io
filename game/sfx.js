@@ -1,14 +1,31 @@
-// sfx.js — Sound effects (Web Audio API) + visual effects
+// sfx.js — Efectos de sonido y visuales sintetizados (sin archivos externos).
+//
+// SFX es un IIFE (función auto-invocada) que devuelve un objeto con la API
+// pública. Las variables y funciones internas (ctx, note, sweep, flash, etc.)
+// no están expuestas — solo los métodos del objeto retornado.
+//
+// Decisiones:
+//   - Sin archivos: todos los sonidos se generan con Web Audio API
+//     (osciladores). Esto evita cargar MP3 y simplifica el deploy.
+//   - Confetti: canvas 2D con 160 partículas y physics simple (gravedad).
+//   - Overlay de win/lose: div creado dinámicamente (no en el HTML) para
+//     que esté disponible en cualquier página sin tener que copiarlo.
 
 const SFX = (() => {
     let _ctx = null
 
+    // ctx lazy-inicializa el AudioContext. Los browsers requieren que se
+    // cree en respuesta a una interacción de usuario, y si está suspendido
+    // (por autoplay policy) hay que llamar resume() para reactivarlo.
     function ctx() {
         if (!_ctx) _ctx = new (window.AudioContext || window.webkitAudioContext)()
         if (_ctx.state === 'suspended') _ctx.resume()
         return _ctx
     }
 
+    // note toca una sola nota: un oscilador conectado a un nodo de ganancia
+    // que decae exponencialmente para evitar el "click" del corte brusco.
+    // `t` es un tiempo absoluto del AudioContext (no Date.now()).
     function note(freq, t, dur, type, vol) {
         try {
             const c = ctx()
@@ -23,6 +40,8 @@ const SFX = (() => {
         } catch (_) {}
     }
 
+    // sweep es como note pero con frecuencia variable (de f0 a f1).
+    // Se usa para sonidos "energéticos" como el GO (sube) y el lose (baja).
     function sweep(f0, f1, t, dur, type, vol) {
         try {
             const c = ctx()
@@ -40,6 +59,11 @@ const SFX = (() => {
 
     // ---- Clickarea flash / shake ----
 
+    // flash agrega una clase CSS al gameArea durante `dur` ms y luego la
+    // remueve. El truco del `void el.offsetWidth` fuerza un reflow del
+    // navegador entre el remove y el add — sin esto, si la misma animación
+    // se dispara dos veces seguidas el browser no la reinicia porque ve la
+    // clase como "ya presente".
     function flash(cls, dur) {
         const el = document.getElementById('gameArea')
         if (!el) return
@@ -53,6 +77,12 @@ const SFX = (() => {
 
     let _canvas = null, _raf = null
 
+    // startConfetti dibuja 160 partículas rotando y cayendo en un canvas
+    // a pantalla completa. La física es muy simple: velocidad inicial
+    // aleatoria + gravedad creciente (elapsed * 0.00008) para que aceleren.
+    // Después de 3s las partículas empiezan a desvanecerse, y a los 7s
+    // se detiene la animación. El canvas se reutiliza entre llamadas para
+    // no fragmentar memoria.
     function startConfetti() {
         if (!_canvas) {
             _canvas = document.createElement('canvas')
@@ -119,6 +149,10 @@ const SFX = (() => {
 
     let _mro = null, _mroTimer = null
 
+    // showOverlay despliega el cartel grande de "¡GANASTE!" o "PERDISTE"
+    // sobre el centro de la pantalla, con el cambio de ELO debajo. Crea
+    // el div la primera vez y lo reutiliza. Auto-desaparece a los 2.5s
+    // con la animación "mro-out" definida en styles.css.
     function showOverlay(win, eloLine) {
         if (!_mro) {
             _mro = document.createElement('div')

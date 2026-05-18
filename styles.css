@@ -2,6 +2,16 @@
 
 /* ============================================================
    VARIABLES
+   ============================================================
+   Todas las propiedades de diseño (colores, alturas, fuentes, radios,
+   timing de transiciones) viven aquí como custom properties. Cambiar
+   --accent (el naranja de la marca) propaga el cambio a TODOS los
+   botones, links activos y estadísticas sin tocar nada más.
+
+   Las 3 fuentes:
+     --font-ui   → texto normal (DM Sans)
+     --font-cond → títulos y números grandes (Barlow Condensed)
+     --font-mono → tiempos en ms y rangos (JetBrains Mono)
    ============================================================ */
 :root {
   --bg:         #0a0a0f;
@@ -273,7 +283,13 @@ button.btn { font-size: 13px; }
 }
 
 /* ============================================================
-   CLICKAREA
+   CLICKAREA — el área grande clicable que cambia entre rojo/verde.
+   ============================================================
+   Es position: relative para que ::after (definido más abajo, sección
+   "Clickarea VFX") pueda posicionarse absolute encima sin afectar el
+   layout normal. Ese ::after se usa para los flashes de win/lose:
+   una capa que aparece y desaparece SIN tocar el fondo del clickarea,
+   evitando que se "rompa" la transición de red↔green↔default.
    ============================================================ */
 .container {
   flex: 1;
@@ -297,6 +313,8 @@ button.btn { font-size: 13px; }
   min-height: calc(100vh - var(--navbar-h));
 }
 
+/* Estados visuales. El verde tiene una animación extra (go-flash) que
+   blanquea brevemente al aparecer — refuerza el cue de "¡ya!". */
 .clickarea.red   { background: var(--red); }
 .clickarea.green { background: var(--green); animation: go-flash 250ms ease-out; }
 
@@ -758,6 +776,13 @@ ol li::marker { color: var(--accent); font-weight: 700; }
 
 /* ============================================================
    CLICKAREA VFX (flash + shake)
+   ============================================================
+   El truco aquí es usar un pseudo-elemento ::after que cubre todo el
+   clickarea (inset: 0) como una "capa de overlay". Cuando se activa
+   .flash-win o .flash-lose, esa capa cambia de opacidad y color SIN
+   tocar el `background` del .clickarea — así el verde/rojo del estado
+   actual se mantiene visible debajo del flash. pointer-events:none
+   evita que la capa intercepte clicks (todos pasan al clickarea).
    ============================================================ */
 .clickarea { position: relative; }
 
@@ -885,6 +910,15 @@ ol li::marker { color: var(--accent); font-weight: 700; }
 
 /* ============================================================
    RESPONSIVE
+   ============================================================
+   Breakpoint único en 768px. Cambios clave en móvil:
+     - Sidebar del leaderboard se OCULTA (los usuarios pueden ir a
+       /ranking/ para verlo en pantalla completa).
+     - Chat panel deja de ser sidebar fija de 260px y pasa a estar
+       DEBAJO del gameArea (game-body cambia a flex-direction:column).
+     - Hero del index se apila verticalmente y los botones toman
+       ancho completo.
+     - Score bar y navbar más compactos.
    ============================================================ */
 @media (max-width: 768px) {
   :root {

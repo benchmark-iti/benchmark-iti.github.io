@@ -1,3 +1,12 @@
+// script.js es el modo offline (sin servidor, sin ELO).
+//
+// Máquina de estados muy simple:
+//   - !testStarted: esperando primer click → al hacer click se pone rojo
+//     y se programa el verde a un tiempo aleatorio.
+//   - testStarted + antes de finishTime: si hace click es "early" → mensaje
+//     de error, reset.
+//   - testStarted + después de finishTime: el verde ya apareció → se muestra
+//     el tiempo de reacción (now - finishTime).
 let testStarted = false
 let startTime = null
 let finishTime = null
@@ -18,6 +27,10 @@ const updateText = (messageText, noteText) => {
    note.textContent = noteText
 }
 
+// handleClick maneja AMBOS clicks: el de inicio (pone rojo + programa verde)
+// y el de reacción (mide tiempo o detecta early). preventDefault y
+// stopPropagation se llaman porque mousedown + touchstart pueden dispararse
+// juntos en móviles, generando doble click.
 const handleClick = event => {
    event.preventDefault()
    event.stopPropagation()
