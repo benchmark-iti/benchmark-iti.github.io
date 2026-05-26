@@ -1,15 +1,20 @@
 // script.js es el modo offline (sin servidor, sin ELO).
 //
-// Máquina de estados muy simple:
-//   - !testStarted: esperando primer click → al hacer click se pone rojo
-//     y se programa el verde a un tiempo aleatorio.
-//   - testStarted + antes de finishTime: si hace click es "early" → mensaje
-//     de error, reset.
-//   - testStarted + después de finishTime: el verde ya apareció → se muestra
-//     el tiempo de reacción (now - finishTime).
-let testStarted = false
-let startTime = null
-let finishTime = null
+// Máquina de estados explícita (3 estados):
+//   - 'idle'    → esperando el primer click. Al hacer click se pone rojo y
+//                 se programa el verde a un tiempo aleatorio.
+//   - 'waiting' → rojo en pantalla, verde programado (timer pendiente). Si
+//                 hace click ahora es "early" → mensaje de error, vuelve a idle.
+//   - 'ready'   → el verde YA apareció. El próximo click mide la reacción.
+//
+// Importante: el estado NO se infiere del reloj. El verde solo "cuenta" cuando
+// el timer realmente dispara y pasa a 'ready'; y el tiempo de reacción se mide
+// desde el instante REAL en que apareció el verde (greenAt), no desde el
+// momento programado. Esto evita el desfase entre setTimeout (que siempre
+// dispara un poco tarde) y la pantalla, que antes dejaba el juego atascado en
+// verde si clicabas justo en esa ventana.
+let state = 'idle'
+let greenAt = 0 // performance.now() del instante en que apareció el verde
 let timer = null
 
 const clickarea = document.querySelector('.clickarea')
@@ -33,46 +38,52 @@ const updateText = (messageText, noteText) => {
 // considera "anticipación" (early click).
 const MIN_REACTION_MS = 100
 
-// handleClick maneja AMBOS clicks: el de inicio (pone rojo + programa verde)
-// y el de reacción (mide tiempo o detecta early). preventDefault y
-// stopPropagation se llaman porque mousedown + touchstart pueden dispararse
+// handleClick maneja los tres clicks posibles según el estado. preventDefault
+// y stopPropagation se llaman porque mousedown + touchstart pueden dispararse
 // juntos en móviles, generando doble click.
 const handleClick = event => {
    event.preventDefault()
    event.stopPropagation()
 
-   if (!testStarted) {
-      const msUntilGreen = randomNumber(2, 5)
-      startTime = new Date()
-      finishTime = new Date(startTime.getTime() + (msUntilGreen * 1000))
+   switch (state) {
+      case 'idle': {
+         const msUntilGreen = randomNumber(2, 5) * 1000
+         clickarea.classList.remove('green')
+         clickarea.classList.add('red')
+         updateText(I18N.t('offline.wait'), '')
+         state = 'waiting'
 
-      clickarea.classList.add('red')
-      updateText(I18N.t('offline.wait'), '')
-      testStarted = true
+         timer = setTimeout(() => {
+            clickarea.classList.remove('red')
+            clickarea.classList.add('green')
+            message.textContent = I18N.t('offline.click')
+            greenAt = performance.now()
+            state = 'ready'
+         }, msUntilGreen)
+         break
+      }
 
-      timer = setTimeout(() => {
-         clickarea.classList.remove('red')
-         clickarea.classList.add('green')
-         message.textContent = I18N.t('offline.click')
-      }, msUntilGreen * 1000)
-   } else {
-      testStarted = false
-
-      const elapsed = new Date() - finishTime
-
-      if (elapsed < 0) {
-         // Clickeó antes del verde — anticipación clara.
+      case 'waiting': {
+         // Clickeó antes de que apareciera el verde — anticipación clara.
          clearTimeout(timer)
          clickarea.classList.remove('red')
          updateText(I18N.t('offline.tooSoon'), I18N.t('offline.retry'))
-      } else if (elapsed < MIN_REACTION_MS) {
-         // Clickeó después del verde pero en menos de 100ms — humanamente
-         // imposible, así que también cuenta como anticipación.
+         state = 'idle'
+         break
+      }
+
+      case 'ready': {
+         // Verde ya visible: medimos desde el instante REAL en que apareció.
+         const elapsed = Math.round(performance.now() - greenAt)
          clickarea.classList.remove('green')
-         updateText(I18N.t('offline.tooSoon'), I18N.t('offline.impossible'))
-      } else {
-         clickarea.classList.remove('green')
-         updateText(`${elapsed}ms`, I18N.t('offline.continue'))
+         if (elapsed < MIN_REACTION_MS) {
+            // Menos de 100ms tras el verde — humanamente imposible.
+            updateText(I18N.t('offline.tooSoon'), I18N.t('offline.impossible'))
+         } else {
+            updateText(`${elapsed}ms`, I18N.t('offline.continue'))
+         }
+         state = 'idle'
+         break
       }
    }
 }
