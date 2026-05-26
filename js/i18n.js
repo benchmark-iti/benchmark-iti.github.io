@@ -440,6 +440,55 @@ const I18N = (() => {
         else nav.appendChild(sw)
     }
 
+    // mountNav convierte SOLO los links de navegación en colapsables para
+    // móvil: los mueve dentro de un wrapper .navbar-collapse e inyecta el botón
+    // hamburguesa. El switch de idioma y el usuario se quedan SIEMPRE visibles
+    // en la barra (no entran al menú). En desktop el wrapper es display:contents
+    // (no afecta al layout); en móvil se vuelve un panel desplegable.
+    //
+    // Debe ejecutarse DESPUÉS de mountSwitch (para que exista .lang-switch) y
+    // después de que el script inline de cada página haya poblado #navUser
+    // (ocurre durante el parse, antes de DOMContentLoaded).
+    function mountNav() {
+        const nav = document.querySelector('.navbar')
+        if (!nav || nav.querySelector('.navbar-toggle')) return
+
+        const collapse = document.createElement('div')
+        collapse.className = 'navbar-collapse'
+        // El colapsable solo envuelve los links; lo dejamos en la posición
+        // original de los links (después del logo) para no alterar el orden.
+        const links = nav.querySelector('.navbar-links')
+        if (links) {
+            nav.insertBefore(collapse, links)
+            collapse.appendChild(links)
+        }
+
+        const toggle = document.createElement('button')
+        toggle.className = 'navbar-toggle'
+        toggle.setAttribute('aria-label', 'Menú')
+        toggle.setAttribute('aria-expanded', 'false')
+        toggle.innerHTML = '<span></span><span></span><span></span>'
+        nav.appendChild(toggle)
+
+        const close = () => {
+            collapse.classList.remove('open')
+            toggle.classList.remove('open')
+            toggle.setAttribute('aria-expanded', 'false')
+        }
+
+        toggle.addEventListener('click', e => {
+            e.stopPropagation() // evita que el listener de "click fuera" lo cierre al instante
+            const open = collapse.classList.toggle('open')
+            toggle.classList.toggle('open', open)
+            toggle.setAttribute('aria-expanded', String(open))
+        })
+
+        // Cerrar al pulsar un link, al clicar fuera del navbar, o con Escape.
+        collapse.querySelectorAll('.navbar-link').forEach(a => a.addEventListener('click', close))
+        document.addEventListener('click', e => { if (!nav.contains(e.target)) close() })
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') close() })
+    }
+
     // Estilos del switch inyectados desde JS para mantener el módulo autónomo.
     function injectStyles() {
         if (document.getElementById('i18n-style')) return
@@ -472,20 +521,103 @@ const I18N = (() => {
         /* Si hay navbar-user, este ya empuja a la derecha; quitamos el auto del switch */
         .navbar-user ~ .lang-switch, .lang-switch:has(~ .navbar-user) { margin-left: 0; }
 
-        /* Móvil: el navbar va apretado, así que el switch se hace compacto. */
-        @media (max-width: 768px) {
-            .lang-switch { margin-right: 8px; }
-            .lang-opt { padding: 5px 7px; font-size: 10px; letter-spacing: 0.04em; }
+        /* --- Menú colapsable (hamburguesa) ---
+           En desktop el wrapper es transparente (display:contents): sus hijos
+           (links, switch, usuario) se comportan como hijos directos del navbar,
+           así que el layout queda IDÉNTICO al de siempre y el botón se oculta. */
+        .navbar-collapse { display: contents; }
+        .navbar-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            flex-shrink: 0;
         }
+        .navbar-toggle span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            margin: 0 auto;
+            border-radius: 2px;
+            background: var(--text-2, #94a3b8);
+            transition: transform .18s ease, opacity .18s ease;
+        }
+        .navbar-toggle:hover span { background: var(--text, #f1f5f9); }
+        /* Animación de las 3 barras a una X cuando está abierto. */
+        .navbar-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .navbar-toggle.open span:nth-child(2) { opacity: 0; }
+        .navbar-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* Móvil: SOLO los links de navegación colapsan en un menú desplegable.
+           El switch EN/ES y el usuario se quedan visibles en la barra. */
+        @media (max-width: 768px) {
+            .navbar-toggle { display: flex; }
+            /* Compactamos la barra para que quepan logo + switch + usuario +
+               hamburguesa en una fila aunque sea un móvil estrecho. */
+            .navbar { padding: 0 12px; gap: 8px; }
+            .navbar-user { gap: 6px; }
+            .navbar-user .btn { padding: 6px 10px; font-size: 12px; }
+
+            /* Los links (que tenían flex:1) ahora están ocultos en el menú, así
+               que empujamos TODO el grupo derecho (switch + usuario +
+               hamburguesa) junto a la derecha con UN solo margin auto, en el
+               primer elemento del grupo. El hamburguesa ya no lleva margin auto
+               (si no, el hueco se repartía y quedaba un gap antes del botón).
+               Repetimos los selectores del :has para ganar en especificidad. */
+            .navbar-user ~ .lang-switch,
+            .lang-switch:has(~ .navbar-user) { margin-left: auto; }
+            .lang-switch { margin-right: 0; }
+            .lang-opt { padding: 5px 7px; font-size: 10px; letter-spacing: 0.04em; }
+
+            .navbar-collapse {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 4px;
+                padding: 10px 16px 14px;
+                background: var(--surface, #111118);
+                border-bottom: 1px solid var(--border, #1e1e2a);
+                box-shadow: 0 12px 24px rgba(0, 0, 0, .45);
+            }
+            .navbar-collapse.open { display: flex; }
+            .navbar-links {
+                flex: none;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 2px;
+                margin-left: 0;
+            }
+            .navbar-link { padding: 11px 12px; font-size: 15px; border-radius: 8px; }
+        }
+
+        /* Móviles estrechos: compactamos al máximo para que logo + switch +
+           usuario + hamburguesa quepan en una fila. El username largo se
+           recorta con … para no empujar el hamburguesa fuera de pantalla. */
         @media (max-width: 480px) {
-            /* En pantallas muy chicas apretamos gaps y links para que el
-               navbar (logo + links + switch + usuario) entre en una sola
-               fila sin desbordar. */
-            .navbar { gap: 8px; }
-            .navbar-links { gap: 0; margin-left: 6px; }
-            .navbar-link { padding: 5px 6px; font-size: 12px; }
-            .lang-switch { margin-right: 6px; }
-            .lang-opt { padding: 4px 6px; }
+            .navbar { padding: 0 10px; gap: 6px; }
+            .navbar-logo { font-size: 16px; }
+            .lang-opt { padding: 4px 6px; font-size: 10px; }
+            .navbar-user { gap: 5px; }
+            .navbar-user .btn { padding: 5px 8px; font-size: 11px; }
+            .navbar-username {
+                font-size: 12px;
+                max-width: 84px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .navbar-toggle { width: 32px; height: 32px; }
+            .navbar-toggle span { width: 20px; }
         }
         `
         const style = document.createElement('style')
@@ -498,7 +630,8 @@ const I18N = (() => {
         injectStyles()
         apply()
         mountSwitch()
+        mountNav()
     })
 
-    return { getLang, setLang, t, apply, mountSwitch }
+    return { getLang, setLang, t, apply, mountSwitch, mountNav }
 })()
