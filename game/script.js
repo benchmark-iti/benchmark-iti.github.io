@@ -47,13 +47,13 @@ const handleClick = event => {
       finishTime = new Date(startTime.getTime() + (msUntilGreen * 1000))
 
       clickarea.classList.add('red')
-      updateText('Espera al verde...', '')
+      updateText(I18N.t('offline.wait'), '')
       testStarted = true
 
       timer = setTimeout(() => {
          clickarea.classList.remove('red')
          clickarea.classList.add('green')
-         message.textContent = 'Click!'
+         message.textContent = I18N.t('offline.click')
       }, msUntilGreen * 1000)
    } else {
       testStarted = false
@@ -64,15 +64,15 @@ const handleClick = event => {
          // Clickeó antes del verde — anticipación clara.
          clearTimeout(timer)
          clickarea.classList.remove('red')
-         updateText('¡Demasiado pronto!', 'Click para intentar de nuevo')
+         updateText(I18N.t('offline.tooSoon'), I18N.t('offline.retry'))
       } else if (elapsed < MIN_REACTION_MS) {
          // Clickeó después del verde pero en menos de 100ms — humanamente
          // imposible, así que también cuenta como anticipación.
          clickarea.classList.remove('green')
-         updateText('¡Demasiado pronto!', 'Reacción imposible (<100ms). Click para reintentar')
+         updateText(I18N.t('offline.tooSoon'), I18N.t('offline.impossible'))
       } else {
          clickarea.classList.remove('green')
-         updateText(`${elapsed}ms`, 'Click para seguir')
+         updateText(`${elapsed}ms`, I18N.t('offline.continue'))
       }
    }
 }

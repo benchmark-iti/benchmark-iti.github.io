@@ -5,41 +5,42 @@
     <link rel="icon" type="image/jpeg" href="/assets/stopwatch.png">
     <link rel="stylesheet" href="/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión | ranked.ms</title>
+    <title data-i18n="title.login">Iniciar sesión | ranked.ms</title>
 </head>
 <body>
     <nav class="navbar">
         <a href="/" class="navbar-logo">ranked<span class="dot">.</span>ms</a>
         <div class="navbar-links">
-            <a href="/" class="navbar-link">Inicio</a>
-            <a href="/ranking/" class="navbar-link">Ranking</a>
-            <a href="/gameplay/" class="navbar-link">Cómo jugar</a>
+            <a href="/" class="navbar-link" data-i18n="nav.home">Inicio</a>
+            <a href="/ranking/" class="navbar-link" data-i18n="nav.ranking">Ranking</a>
+            <a href="/gameplay/" class="navbar-link" data-i18n="nav.howto">Cómo jugar</a>
         </div>
     </nav>
 
     <div class="auth-container">
         <div class="auth-card">
-            <h2 class="auth-title">Iniciar sesión</h2>
+            <h2 class="auth-title" data-i18n="login.title">Iniciar sesión</h2>
             <form id="loginForm">
                 <div class="form-group">
-                    <label class="form-label">Usuario</label>
+                    <label class="form-label" data-i18n="form.username">Usuario</label>
                     <input class="form-input" type="text" id="username" autocomplete="username" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Contraseña</label>
+                    <label class="form-label" data-i18n="form.password">Contraseña</label>
                     <input class="form-input" type="password" id="password" autocomplete="current-password" required>
                 </div>
                 <p class="form-error" id="errorMsg"></p>
-                <button class="btn btn-block btn-accent" type="submit" id="submitBtn">Entrar</button>
+                <button class="btn btn-block btn-accent" type="submit" id="submitBtn" data-i18n="login.submit">Entrar</button>
             </form>
             <p class="auth-footer">
-                ¿No tienes cuenta? <a href="/register/">Regístrate</a>
+                <span data-i18n="login.noAccount">¿No tienes cuenta?</span> <a href="/register/" data-i18n="login.registerLink">Regístrate</a>
             </p>
         </div>
     </div>
 
     <script src="/js/config.js"></script>
     <script src="/js/auth.js"></script>
+    <script src="/js/i18n.js"></script>
     <script>
         if (AUTH.isLoggedIn()) window.location.href = '/'
 
@@ -67,7 +68,7 @@
                 AUTH.save(data.token, data.username)
                 window.location.href = '/'
             } catch {
-                err.textContent = 'Error de conexión'
+                err.textContent = I18N.t('error.connection')
             } finally {
                 btn.disabled = false
             }

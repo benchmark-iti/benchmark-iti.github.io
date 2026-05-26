@@ -75,13 +75,13 @@ function connect() {
     ws.onclose = () => {
         if (gameState !== 'lobby') {
             showLobby()
-            setLobbyError('Conexión perdida. Reconectando...')
+            setLobbyError(I18N.t('online.connLost'))
             setTimeout(connect, 2500)
         }
     }
 
     ws.onerror = () => {
-        setLobbyError('No se pudo conectar al servidor.')
+        setLobbyError(I18N.t('online.connFail'))
     }
 }
 
@@ -126,7 +126,7 @@ function onRoomCreated(msg) {
 }
 
 function onOpponentJoined() {
-    roomCreated.querySelector('p').textContent = '¡Oponente encontrado!'
+    roomCreated.querySelector('p').textContent = I18N.t('online.opponentFound')
 }
 
 function onRoomJoined() {
@@ -151,25 +151,25 @@ function onMatchStart(msg) {
     clearChat()
     SFX.hideOverlay()
 
-    scoreLabelYou.textContent = myUsername || 'Tú'
+    scoreLabelYou.textContent = myUsername || I18N.t('score.you')
     scoreLabelOpp.textContent = msg.opponent
     updateScore(0, 0)
     scoreRound.textContent = ''
 
     setColor(null)
-    setMsg(`vs ${msg.opponent}`, `Tu ELO: ${msg.yourElo} — Oponente: ${msg.opponentElo}`)
+    setMsg(I18N.t('online.vs', { opp: msg.opponent }), I18N.t('online.eloLine', { you: msg.yourElo, opp: msg.opponentElo }))
     gameActions.style.display = 'none'
 
-    addChatSystem(`Partida iniciada vs ${msg.opponent}`)
+    addChatSystem(I18N.t('online.matchStarted', { opp: msg.opponent }))
 }
 
 function onRoundStart(msg) {
     gameState = 'round_ready'
     hasClicked = false
     setColor('red')
-    setMsg(`Ronda ${msg.round}`, 'Espera al verde...')
+    setMsg(I18N.t('online.round', { n: msg.round }), I18N.t('offline.wait'))
     updateScore(msg.score.you, msg.score.opponent)
-    scoreRound.textContent = `RONDA ${msg.round}`
+    scoreRound.textContent = I18N.t('online.roundLabel', { n: msg.round })
     gameActions.style.display = 'none'
 }
 
@@ -187,13 +187,13 @@ function onGo() {
     goTime = performance.now()
     gameState = 'round_active'
     setColor('green')
-    setMsg('¡Click!', '')
+    setMsg(I18N.t('offline.click'), '')
 }
 
 function onBothEarly() {
     hasClicked = false
     setColor(null)
-    setMsg('¡Ambos muy pronto!', 'Repitiendo ronda...')
+    setMsg(I18N.t('online.bothEarly'), I18N.t('online.repeating'))
 }
 
 function onRoundResult(msg) {
@@ -204,19 +204,19 @@ function onRoundResult(msg) {
     if (msg.won) { SFX.roundWin(); SFX.flashWin() }
     else         { SFX.roundLose(); SFX.flashLose() }
 
-    const wonText = msg.won ? '¡Ganaste esta ronda!' : 'Perdiste esta ronda'
-    setMsg(wonText, `Tú: ${fmtMs(msg.yourMs)} — Oponente: ${fmtMs(msg.opponentMs)}`)
+    const wonText = msg.won ? I18N.t('online.wonRound') : I18N.t('online.lostRound')
+    setMsg(wonText, I18N.t('online.youOppMs', { you: fmtMs(msg.yourMs), opp: fmtMs(msg.opponentMs) }))
 }
 
 function onMatchEnd(msg) {
     gameState = 'match_end'
     setColor(null)
-    scoreRound.textContent = 'FIN'
+    scoreRound.textContent = I18N.t('online.end')
 
     const sign = msg.eloChange >= 0 ? '+' : ''
     const eloLine = `${sign}${msg.eloChange} ELO → ${msg.newElo}`
-    const wonText = msg.won ? '¡Ganaste la partida!' : 'Perdiste la partida'
-    setMsg(wonText, `ELO: ${eloLine}  ·  ${msg.score.you}–${msg.score.opponent}`)
+    const wonText = msg.won ? I18N.t('online.wonMatch') : I18N.t('online.lostMatch')
+    setMsg(wonText, I18N.t('online.matchEloLine', { elo: eloLine, a: msg.score.you, b: msg.score.opponent }))
 
     if (msg.won) { SFX.matchWin(); SFX.startConfetti(); SFX.showOverlay(true,  eloLine) }
     else         { SFX.matchLose();                     SFX.showOverlay(false, eloLine) }
@@ -227,12 +227,12 @@ function onMatchEnd(msg) {
 function onOpponentDisconnected(msg) {
     gameState = 'match_end'
     setColor(null)
-    scoreRound.textContent = 'FIN'
+    scoreRound.textContent = I18N.t('online.end')
 
     const sign = msg.eloChange >= 0 ? '+' : ''
     const eloLine = `${sign}${msg.eloChange} ELO → ${msg.newElo}`
-    setMsg('Oponente desconectado', `Ganaste por abandono · ELO: ${eloLine}`)
-    addChatSystem('El oponente se desconectó.')
+    setMsg(I18N.t('online.oppDisc'), I18N.t('online.wonByAbandon', { elo: eloLine }))
+    addChatSystem(I18N.t('online.oppDiscChat'))
 
     SFX.matchWin()
     SFX.startConfetti()
@@ -251,24 +251,24 @@ function onRematchAvailable() {
 }
 
 function onRematchRequested(msg) {
-    addChatSystem(`${msg.from} quiere la revancha.`)
+    addChatSystem(I18N.t('online.wantsRematch', { name: msg.from }))
     showRematchUI('accept')
 }
 
 function onRematchStarting() {
     showRematchUI('starting')
-    addChatSystem('¡Revancha iniciando!')
-    setMsg('¡Revancha!', 'Preparate...')
+    addChatSystem(I18N.t('online.rematchStarting'))
+    setMsg(I18N.t('online.rematchTitle'), I18N.t('online.getReady'))
     // Match will reset; match_start arrives from server
 }
 
 function onRematchDeclined() {
-    addChatSystem('Revancha rechazada.')
+    addChatSystem(I18N.t('online.rematchDeclined'))
     showLobby()
 }
 
 function onRematchTimeout() {
-    addChatSystem('Tiempo de revancha agotado.')
+    addChatSystem(I18N.t('online.rematchTimeout'))
     showLobby()
 }
 
@@ -305,7 +305,7 @@ function hideJoin() {
 function joinRoom() {
     const code = document.getElementById('roomCodeInput').value.trim().toUpperCase()
     if (code.length !== 6) {
-        setLobbyError('El código debe tener 6 caracteres')
+        setLobbyError(I18N.t('online.codeLen'))
         return
     }
     if (!wsReady()) return
@@ -396,7 +396,7 @@ function handleAreaClick(e) {
             SFX.early()
             SFX.shakeEarly()
             setColor(null)
-            setMsg('¡Demasiado pronto!', 'Perdiste esta ronda')
+            setMsg(I18N.t('offline.tooSoon'), I18N.t('online.lostRound'))
             return
         }
         ws.send(JSON.stringify({ type: 'reaction', ms }))
@@ -407,7 +407,7 @@ function handleAreaClick(e) {
         SFX.early()
         SFX.shakeEarly()
         setColor(null)
-        setMsg('¡Demasiado pronto!', 'Perdiste esta ronda')
+        setMsg(I18N.t('offline.tooSoon'), I18N.t('online.lostRound'))
     }
 }
 
@@ -462,35 +462,35 @@ function showRematchUI(mode) {
     rematchNote.textContent = ''
 
     if (mode === 'available') {
-        btnRematch.textContent = 'Revancha'
+        btnRematch.textContent = I18N.t('online.rematch')
         btnRematch.className = 'btn btn-outline btn-lg'
         btnRematch.disabled = false
         btnRematch.style.display = ''
         btnRematch.onclick = requestRematch
-        btnDecline.textContent = 'Volver al lobby'
+        btnDecline.textContent = I18N.t('online.backToLobby')
         btnDecline.style.display = ''
     } else if (mode === 'pending') {
-        btnRematch.textContent = 'Esperando...'
+        btnRematch.textContent = I18N.t('online.waiting')
         btnRematch.className = 'btn btn-lg'
         btnRematch.disabled = true
-        btnDecline.textContent = 'Cancelar'
+        btnDecline.textContent = I18N.t('online.cancel')
         btnDecline.style.display = ''
     } else if (mode === 'accept') {
-        btnRematch.textContent = 'Aceptar revancha'
+        btnRematch.textContent = I18N.t('online.acceptRematch')
         btnRematch.className = 'btn btn-accent btn-lg'
         btnRematch.disabled = false
         btnRematch.onclick = acceptRematch
-        btnDecline.textContent = 'Rechazar'
+        btnDecline.textContent = I18N.t('online.decline')
         btnDecline.style.display = ''
     } else if (mode === 'starting') {
-        btnRematch.textContent = '¡Comenzando!'
+        btnRematch.textContent = I18N.t('online.starting')
         btnRematch.className = 'btn btn-lg'
         btnRematch.disabled = true
         btnDecline.style.display = 'none'
     } else if (mode === 'gone') {
         // Opponent disconnected — no rematch
         btnRematch.style.display = 'none'
-        btnDecline.textContent = 'Volver al lobby'
+        btnDecline.textContent = I18N.t('online.backToLobby')
         btnDecline.style.display = ''
     }
 }
@@ -512,8 +512,8 @@ function escapeHtml(str) {
 }
 
 function fmtMs(ms) {
-    if (ms === -1) return 'muy pronto'
-    if (ms >= 9000) return 'timeout'
+    if (ms === -1) return I18N.t('fmt.tooSoon')
+    if (ms >= 9000) return I18N.t('fmt.timeout')
     return `${ms}ms`
 }
 

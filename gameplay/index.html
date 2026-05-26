@@ -5,7 +5,7 @@
     <link rel="icon" type="image/jpeg" href="/assets/stopwatch.png">
     <link rel="stylesheet" href="/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cómo jugar | ranked.ms</title>
+    <title data-i18n="title.howto">Cómo jugar | ranked.ms</title>
     <style>
         .func-section {
             margin-bottom: 40px;
@@ -141,178 +141,179 @@
     <nav class="navbar">
         <a href="/" class="navbar-logo">ranked<span class="dot">.</span>ms</a>
         <div class="navbar-links">
-            <a href="/" class="navbar-link">Inicio</a>
-            <a href="/ranking/" class="navbar-link">Ranking</a>
-            <a href="/gameplay/" class="navbar-link active">Cómo jugar</a>
+            <a href="/" class="navbar-link" data-i18n="nav.home">Inicio</a>
+            <a href="/ranking/" class="navbar-link" data-i18n="nav.ranking">Ranking</a>
+            <a href="/gameplay/" class="navbar-link active" data-i18n="nav.howto">Cómo jugar</a>
         </div>
     </nav>
 
     <div class="funcionamiento">
     <div class="funcionamiento-content">
 
-        <h1>Cómo jugar</h1>
+        <h1 data-i18n="howto.title">Cómo jugar</h1>
 
         <!-- QUÉ ES -->
         <div class="func-section">
-            <h2>¿Qué es ranked.ms?</h2>
-            <p>
+            <h2 data-i18n="howto.what.h">¿Qué es ranked.ms?</h2>
+            <p data-i18n-html="howto.what.p1">
                 ranked.ms es un juego de <strong>tiempo de reacción</strong> en formato 1 contra 1. El objetivo es simple: cuando la pantalla se ponga verde, haz clic lo más rápido posible. El que reaccione antes gana la ronda.
             </p>
-            <p>
+            <p data-i18n-html="howto.what.p2">
                 Compite en partidas clasificatorias, sube tu ELO, y aparece en el ranking global.
             </p>
         </div>
 
         <!-- UNA RONDA -->
         <div class="func-section">
-            <h2>Una ronda, paso a paso</h2>
+            <h2 data-i18n="howto.round.h">Una ronda, paso a paso</h2>
             <ol class="step-list">
                 <li>
                     <span class="step-num">1</span>
-                    <span>La pantalla se pone <strong>roja</strong>. Pon el dedo o el cursor encima y espera. Todavía no es momento.</span>
+                    <span data-i18n-html="howto.round.s1">La pantalla se pone <strong>roja</strong>. Pon el dedo o el cursor encima y espera. Todavía no es momento.</span>
                 </li>
                 <li>
                     <span class="step-num">2</span>
-                    <span>Después de un tiempo <strong>aleatorio</strong> (entre 2 y 5 segundos), la pantalla se vuelve <strong>verde</strong>. Ese es tu momento: ¡haz clic!</span>
+                    <span data-i18n-html="howto.round.s2">Después de un tiempo <strong>aleatorio</strong> (entre 2 y 5 segundos), la pantalla se vuelve <strong>verde</strong>. Ese es tu momento: ¡haz clic!</span>
                 </li>
                 <li>
                     <span class="step-num">3</span>
-                    <span>El servidor mide ambos tiempos de reacción. <strong>El que haga clic primero gana la ronda</strong> y ve su tiempo en milisegundos.</span>
+                    <span data-i18n-html="howto.round.s3">El servidor mide ambos tiempos de reacción. <strong>El que haga clic primero gana la ronda</strong> y ve su tiempo en milisegundos.</span>
                 </li>
             </ol>
 
             <div class="color-demo">
                 <div class="color-chip">
                     <div class="color-dot" style="background:#dc2626"></div>
-                    Rojo — espera, no hagas clic
+                    <span data-i18n="howto.color.red">Rojo — espera, no hagas clic</span>
                 </div>
                 <div class="color-chip">
                     <div class="color-dot" style="background:#22c55e"></div>
-                    Verde — ¡haz clic ahora!
+                    <span data-i18n="howto.color.green">Verde — ¡haz clic ahora!</span>
                 </div>
                 <div class="color-chip">
                     <div class="color-dot" style="background:#18181f; border:1px solid #28283a"></div>
-                    Gris — entre rondas, espera
+                    <span data-i18n="howto.color.gray">Gris — entre rondas, espera</span>
                 </div>
             </div>
         </div>
 
         <!-- CLIC ANTICIPADO -->
         <div class="func-section">
-            <h2>El clic anticipado</h2>
-            <p>
+            <h2 data-i18n="howto.early.h">El clic anticipado</h2>
+            <p data-i18n-html="howto.early.p1">
                 Si haces clic <strong>antes de que la pantalla se ponga verde</strong> (mientras aún está roja o gris), pierdes esa ronda automáticamente. No importa lo rápido que sea tu rival: el que hace trampa pierde.
             </p>
-            <p>
+            <p data-i18n-html="howto.early.p2">
                 El tiempo aleatorio existe precisamente para esto — memorizar el ritmo no sirve de nada.
             </p>
         </div>
 
         <!-- UNA PARTIDA -->
         <div class="func-section">
-            <h2>¿Cómo se gana la partida?</h2>
-            <p>
+            <h2 data-i18n="howto.match.h">¿Cómo se gana la partida?</h2>
+            <p data-i18n-html="howto.match.p1">
                 Una partida es al <strong>mejor de 5 rondas</strong>. El primero en ganar <strong>3 rondas</strong> gana la partida y se lleva los puntos ELO.
             </p>
 
             <div class="callout-row">
                 <div class="callout">
-                    <div class="callout-label">Rondas por partida</div>
+                    <div class="callout-label" data-i18n="howto.match.c1.l">Rondas por partida</div>
                     <div class="callout-value">5</div>
-                    <div class="callout-desc">Mejor de 5</div>
+                    <div class="callout-desc" data-i18n="howto.match.c1.d">Mejor de 5</div>
                 </div>
                 <div class="callout">
-                    <div class="callout-label">Para ganar</div>
-                    <div class="callout-value">3 rondas</div>
-                    <div class="callout-desc">Primero en llegar</div>
+                    <div class="callout-label" data-i18n="howto.match.c2.l">Para ganar</div>
+                    <div class="callout-value" data-i18n="howto.match.c2.v">3 rondas</div>
+                    <div class="callout-desc" data-i18n="howto.match.c2.d">Primero en llegar</div>
                 </div>
                 <div class="callout">
-                    <div class="callout-label">Tiempo límite / ronda</div>
-                    <div class="callout-value">10 s</div>
-                    <div class="callout-desc">Sin clic = timeout</div>
+                    <div class="callout-label" data-i18n="howto.match.c3.l">Tiempo límite / ronda</div>
+                    <div class="callout-value" data-i18n="howto.match.c3.v">10 s</div>
+                    <div class="callout-desc" data-i18n="howto.match.c3.d">Sin clic = timeout</div>
                 </div>
             </div>
 
-            <p>
+            <p data-i18n-html="howto.match.p2">
                 Si un jugador se desconecta durante la partida, el otro gana automáticamente y el ELO cambia como si hubiera terminado en ese momento.
             </p>
         </div>
 
         <!-- MODOS -->
         <div class="func-section">
-            <h2>Modos de juego</h2>
+            <h2 data-i18n="howto.modes.h">Modos de juego</h2>
 
-            <p><strong>Buscar partida aleatoria</strong><br>
+            <p data-i18n-html="howto.modes.random"><strong>Buscar partida aleatoria</strong><br>
             Entra a la cola de emparejamiento y el sistema te conectará con el primer jugador disponible de diferente cuenta. Es la forma más rápida de jugar.</p>
 
-            <p><strong>Sala privada</strong><br>
+            <p data-i18n-html="howto.modes.private"><strong>Sala privada</strong><br>
             Crea una sala y comparte el código de 6 letras con quien quieras. La sala espera hasta que alguien se una con ese código y la partida arranca sola.</p>
 
-            <p><strong>Modo offline</strong><br>
+            <p data-i18n-html="howto.modes.offline"><strong>Modo offline</strong><br>
             Practica sin cuenta ni rival. Mide tu tiempo de reacción en solitario, sin presión y sin que afecte a tu ELO.</p>
         </div>
 
         <!-- ELO -->
         <div class="func-section">
-            <h2>Sistema ELO</h2>
-            <p>
+            <h2 data-i18n="howto.elo.h">Sistema ELO</h2>
+            <p data-i18n-html="howto.elo.p1">
                 El ELO es tu <strong>puntuación de habilidad</strong>. Todos empiezan con <strong>1000 puntos</strong>. Ganas ELO al vencer rivales y pierdes al perder contra ellos.
             </p>
-            <p>
+            <p data-i18n-html="howto.elo.p2">
                 La cantidad de puntos que ganas o pierdes depende de la diferencia de ELO: si vences a alguien mucho mejor que tú, ganarás más. Si pierdes contra alguien muy inferior, perderás más. El mínimo de ELO es siempre 0.
             </p>
 
             <div class="callout-row">
                 <div class="callout">
-                    <div class="callout-label">ELO inicial</div>
+                    <div class="callout-label" data-i18n="howto.elo.c1.l">ELO inicial</div>
                     <div class="callout-value">1000</div>
-                    <div class="callout-desc">Para todos</div>
+                    <div class="callout-desc" data-i18n="howto.elo.c1.d">Para todos</div>
                 </div>
                 <div class="callout">
-                    <div class="callout-label">Factor K</div>
+                    <div class="callout-label" data-i18n="howto.elo.c2.l">Factor K</div>
                     <div class="callout-value">32</div>
-                    <div class="callout-desc">Cambio máximo por partida</div>
+                    <div class="callout-desc" data-i18n="howto.elo.c2.d">Cambio máximo por partida</div>
                 </div>
                 <div class="callout">
-                    <div class="callout-label">ELO mínimo</div>
+                    <div class="callout-label" data-i18n="howto.elo.c3.l">ELO mínimo</div>
                     <div class="callout-value">0</div>
-                    <div class="callout-desc">No baja de cero</div>
+                    <div class="callout-desc" data-i18n="howto.elo.c3.d">No baja de cero</div>
                 </div>
             </div>
         </div>
 
         <!-- REVANCHA -->
         <div class="func-section">
-            <h2>Revancha</h2>
-            <p>
+            <h2 data-i18n="howto.rematch.h">Revancha</h2>
+            <p data-i18n-html="howto.rematch.p1">
                 Al terminar una partida, ambos jugadores tienen <strong>30 segundos</strong> para pedir la revancha. Si los dos aceptan, la partida vuelve a empezar inmediatamente en la misma sala, con el chat abierto. Si alguno rechaza o el tiempo se agota, la sala se cierra.
             </p>
         </div>
 
         <!-- RANKINGS -->
         <div class="func-section">
-            <h2>Rankings</h2>
-            <p>En la página principal hay tres tablas de clasificación:</p>
+            <h2 data-i18n="howto.rankings.h">Rankings</h2>
+            <p data-i18n="howto.rankings.p1">En la página principal hay tres tablas de clasificación:</p>
             <ul class="tip-list">
-                <li><strong>ELO</strong> — los jugadores con más puntos de habilidad acumulados.</li>
-                <li><strong>Victorias</strong> — los jugadores con más partidas ganadas en total.</li>
-                <li><strong>Tiempo</strong> — las reacciones más rápidas registradas en partidas online (el modo offline no cuenta).</li>
+                <li data-i18n-html="howto.rankings.elo"><strong>ELO</strong> — los jugadores con más puntos de habilidad acumulados.</li>
+                <li data-i18n-html="howto.rankings.wins"><strong>Victorias</strong> — los jugadores con más partidas ganadas en total.</li>
+                <li data-i18n-html="howto.rankings.time"><strong>Tiempo</strong> — las reacciones más rápidas registradas en partidas online (el modo offline no cuenta).</li>
             </ul>
         </div>
 
         <!-- CONSEJOS -->
         <div class="func-section">
-            <h2>Consejos para mejorar</h2>
+            <h2 data-i18n="howto.tips.h">Consejos para mejorar</h2>
             <ul class="tip-list">
-                <li>Mantén el cursor o el dedo sobre la pantalla desde que empieza la cuenta atrás — moverlo tarda milisegundos extra.</li>
-                <li>No intentes anticiparte: el tiempo es aleatorio entre 2 y 5 segundos. Si haces clic antes, pierdes la ronda.</li>
-                <li>Un tiempo de reacción humano promedio es de unos <strong>200–250 ms</strong>. Por debajo de 180 ms ya estás por encima de la media.</li>
-                <li>La fatiga y las pantallas de alta frecuencia de actualización afectan tu tiempo. Un monitor de 144 Hz muestra el verde antes que uno de 60 Hz.</li>
-                <li>El modo offline es gratis para practicar sin arriesgar ELO.</li>
+                <li data-i18n-html="howto.tips.t1">Mantén el cursor o el dedo sobre la pantalla desde que empieza la cuenta atrás — moverlo tarda milisegundos extra.</li>
+                <li data-i18n-html="howto.tips.t2">No intentes anticiparte: el tiempo es aleatorio entre 2 y 5 segundos. Si haces clic antes, pierdes la ronda.</li>
+                <li data-i18n-html="howto.tips.t3">Un tiempo de reacción humano promedio es de unos <strong>200–250 ms</strong>. Por debajo de 180 ms ya estás por encima de la media.</li>
+                <li data-i18n-html="howto.tips.t4">La fatiga y las pantallas de alta frecuencia de actualización afectan tu tiempo. Un monitor de 144 Hz muestra el verde antes que uno de 60 Hz.</li>
+                <li data-i18n-html="howto.tips.t5">El modo offline es gratis para practicar sin arriesgar ELO.</li>
             </ul>
         </div>
 
     </div>
     </div>
+    <script src="/js/i18n.js"></script>
 </body>
 </html>

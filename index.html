@@ -5,15 +5,15 @@
     <link rel="icon" type="image/jpeg" href="assets/stopwatch.png">
     <link rel="stylesheet" href="styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ranked.ms</title>
+    <title data-i18n="title.home">ranked.ms</title>
 </head>
 <body>
     <nav class="navbar">
         <a href="/" class="navbar-logo">ranked<span class="dot">.</span>ms</a>
         <div class="navbar-links">
-            <a href="/" class="navbar-link active">Inicio</a>
-            <a href="/ranking/" class="navbar-link">Ranking</a>
-            <a href="/gameplay/" class="navbar-link">Cómo jugar</a>
+            <a href="/" class="navbar-link active" data-i18n="nav.home">Inicio</a>
+            <a href="/ranking/" class="navbar-link" data-i18n="nav.ranking">Ranking</a>
+            <a href="/gameplay/" class="navbar-link" data-i18n="nav.howto">Cómo jugar</a>
         </div>
         <div class="navbar-user" id="navUser"></div>
     </nav>
@@ -22,44 +22,44 @@
         <!-- Leaderboard sidebar -->
         <div class="sidebar">
             <div class="lb-tabs">
-                <button class="lb-tab active" onclick="loadLb('elo', this)">ELO</button>
-                <button class="lb-tab" onclick="loadLb('wins', this)">Victorias</button>
-                <button class="lb-tab" onclick="loadLb('times', this)">Tiempo</button>
+                <button class="lb-tab active" onclick="loadLb('elo', this)" data-i18n="lb.elo">ELO</button>
+                <button class="lb-tab" onclick="loadLb('wins', this)" data-i18n="lb.wins">Victorias</button>
+                <button class="lb-tab" onclick="loadLb('times', this)" data-i18n="lb.time">Tiempo</button>
             </div>
             <div id="lbList">
-                <div class="lb-loading">Cargando...</div>
+                <div class="lb-loading" data-i18n="lb.loading">Cargando...</div>
             </div>
         </div>
 
         <!-- Main hero -->
         <main class="content">
             <div class="hero">
-                <p class="hero-eyebrow">Tiempo de reacción &middot; 1 vs 1</p>
+                <p class="hero-eyebrow" data-i18n="index.eyebrow">Tiempo de reacción · 1 vs 1</p>
                 <h1 class="hero-title">ranked<span class="dot">.</span>ms</h1>
                 <p class="hero-tagline">
                 </p>
 
                 <div class="hero-stats" id="heroStats">
                     <div class="hero-stat">
-                        <span class="hero-stat-label">Top ELO</span>
+                        <span class="hero-stat-label" data-i18n="stat.topElo">Top ELO</span>
                         <span class="hero-stat-value" id="statEloVal">—</span>
-                        <span class="hero-stat-who" id="statEloWho">cargando</span>
+                        <span class="hero-stat-who" id="statEloWho" data-i18n="stat.loading">cargando</span>
                     </div>
                     <div class="hero-stat">
-                        <span class="hero-stat-label">Victorias</span>
+                        <span class="hero-stat-label" data-i18n="stat.wins">Victorias</span>
                         <span class="hero-stat-value" id="statWinsVal">—</span>
-                        <span class="hero-stat-who" id="statWinsWho">cargando</span>
+                        <span class="hero-stat-who" id="statWinsWho" data-i18n="stat.loading">cargando</span>
                     </div>
                     <div class="hero-stat">
-                        <span class="hero-stat-label">Récord</span>
+                        <span class="hero-stat-label" data-i18n="stat.record">Récord</span>
                         <span class="hero-stat-value" id="statTimeVal">—</span>
-                        <span class="hero-stat-who" id="statTimeWho">cargando</span>
+                        <span class="hero-stat-who" id="statTimeWho" data-i18n="stat.loading">cargando</span>
                     </div>
                 </div>
 
                 <div class="hero-actions">
-                    <a href="/game/online.html" class="btn btn-accent btn-xl">Jugar Online</a>
-                    <a href="/game/offline.html" class="btn btn-xl">Práctica</a>
+                    <a href="/game/online.html" class="btn btn-accent btn-xl" data-i18n="index.playOnline">Jugar Online</a>
+                    <a href="/game/offline.html" class="btn btn-xl" data-i18n="index.practice">Práctica</a>
                 </div>
             </div>
         </main>
@@ -67,21 +67,22 @@
 
     <script src="/js/config.js"></script>
     <script src="/js/auth.js"></script>
+    <script src="/js/i18n.js"></script>
     <script>
         // Navbar
         const user = AUTH.getUser()
         if (user) {
             document.getElementById('navUser').innerHTML =
                 `<span class="navbar-username">${user.username}</span>
-                 <button class="btn btn-ghost btn-sm" onclick="AUTH.logout()">Salir</button>`
+                 <button class="btn btn-ghost btn-sm" onclick="AUTH.logout()">${I18N.t('nav.logout')}</button>`
         } else {
             document.getElementById('navUser').innerHTML =
-                `<a href="/login/" class="btn btn-sm">Entrar</a>
-                 <a href="/register/" class="btn btn-sm btn-accent">Registrarse</a>`
+                `<a href="/login/" class="btn btn-sm">${I18N.t('nav.login')}</a>
+                 <a href="/register/" class="btn btn-sm btn-accent">${I18N.t('nav.register')}</a>`
         }
 
         // Leaderboard sidebar
-        const lbSuffix = { elo: 'ELO', wins: 'vic.', times: 'ms' }
+        const lbSuffix = () => ({ elo: I18N.t('lb.suffix.elo'), wins: I18N.t('lb.suffix.wins'), times: I18N.t('lb.suffix.times') })
         const medalClass = n => n === 1 ? 'lb-rank-1' : n === 2 ? 'lb-rank-2' : n === 3 ? 'lb-rank-3' : ''
 
         async function loadLb(type, btn) {
@@ -89,7 +90,7 @@
             if (btn) btn.classList.add('active')
 
             const list = document.getElementById('lbList')
-            list.innerHTML = '<div class="lb-loading">Cargando...</div>'
+            list.innerHTML = `<div class="lb-loading">${I18N.t('lb.loading')}</div>`
 
             try {
                 const res = await fetch(`${CONFIG.backendUrl}/api/leaderboard/${type}`)
@@ -97,18 +98,19 @@
                 const data = await res.json()
 
                 if (!data.length) {
-                    list.innerHTML = '<div class="lb-loading">Sin datos aún</div>'
+                    list.innerHTML = `<div class="lb-loading">${I18N.t('lb.empty')}</div>`
                     return
                 }
 
+                const suffix = lbSuffix()[type]
                 list.innerHTML = data.map(e => `
                     <div class="lb-row">
                         <span class="lb-rank ${medalClass(e.rank)}">${e.rank}</span>
                         <span class="lb-name">${e.username}</span>
-                        <span class="lb-time">${e.value} ${lbSuffix[type]}</span>
+                        <span class="lb-time">${e.value} ${suffix}</span>
                     </div>`).join('')
             } catch {
-                list.innerHTML = '<div class="lb-loading">Error al cargar</div>'
+                list.innerHTML = `<div class="lb-loading">${I18N.t('lb.error')}</div>`
             }
         }
 
@@ -121,9 +123,9 @@
                     fetch(`${CONFIG.backendUrl}/api/leaderboard/wins`).then(r => r.json()),
                     fetch(`${CONFIG.backendUrl}/api/leaderboard/times`).then(r => r.json()),
                 ])
-                if (elo && elo[0])   { dash('statEloVal').textContent = elo[0].value + ' ELO';   dash('statEloWho').textContent  = elo[0].username }
-                if (wins && wins[0]) { dash('statWinsVal').textContent = wins[0].value + ' vic.'; dash('statWinsWho').textContent = wins[0].username }
-                if (times && times[0]) { dash('statTimeVal').textContent = times[0].value + ' ms'; dash('statTimeWho').textContent = times[0].username }
+                if (elo && elo[0])   { dash('statEloVal').textContent = elo[0].value + ' ' + I18N.t('lb.suffix.elo');   dash('statEloWho').textContent  = elo[0].username }
+                if (wins && wins[0]) { dash('statWinsVal').textContent = wins[0].value + ' ' + I18N.t('lb.suffix.wins'); dash('statWinsWho').textContent = wins[0].username }
+                if (times && times[0]) { dash('statTimeVal').textContent = times[0].value + ' ' + I18N.t('lb.suffix.times'); dash('statTimeWho').textContent = times[0].username }
             } catch {}
         }
 

@@ -5,15 +5,15 @@
     <link rel="icon" type="image/jpeg" href="/assets/stopwatch.png">
     <link rel="stylesheet" href="/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online | ranked.ms</title>
+    <title data-i18n="title.online">Online | ranked.ms</title>
 </head>
 <body>
     <nav class="navbar">
         <a href="/" class="navbar-logo">ranked<span class="dot">.</span>ms</a>
         <div class="navbar-links">
-            <a href="/" class="navbar-link">Inicio</a>
-            <a href="/ranking/" class="navbar-link">Ranking</a>
-            <a href="/gameplay/" class="navbar-link">Cómo jugar</a>
+            <a href="/" class="navbar-link" data-i18n="nav.home">Inicio</a>
+            <a href="/ranking/" class="navbar-link" data-i18n="nav.ranking">Ranking</a>
+            <a href="/gameplay/" class="navbar-link" data-i18n="nav.howto">Cómo jugar</a>
         </div>
         <div class="navbar-user" id="navUser"></div>
     </nav>
@@ -22,24 +22,24 @@
     <div id="lobbySection">
         <div class="lobby-container">
             <div class="lobby-card">
-                <h2 class="lobby-title">Online 1v1</h2>
+                <h2 class="lobby-title" data-i18n="online.lobbyTitle">Online 1v1</h2>
                 <p class="form-error" id="lobbyError"></p>
 
                 <div id="lobbyBtns" class="lobby-options">
-                    <button class="btn btn-accent btn-block btn-lg" onclick="findMatch()">
+                    <button class="btn btn-accent btn-block btn-lg" onclick="findMatch()" data-i18n="online.findMatch">
                         Buscar partida aleatoria
                     </button>
-                    <div class="lobby-divider">o</div>
-                    <button class="btn btn-block" onclick="createRoom()">Crear sala privada</button>
-                    <button class="btn btn-block" onclick="showJoin()">Unirse con código</button>
+                    <div class="lobby-divider" data-i18n="online.or">o</div>
+                    <button class="btn btn-block" onclick="createRoom()" data-i18n="online.createRoom">Crear sala privada</button>
+                    <button class="btn btn-block" onclick="showJoin()" data-i18n="online.joinCode">Unirse con código</button>
                 </div>
 
                 <!-- Room created: show code -->
                 <div id="roomCreated" style="display:none">
-                    <p class="lobby-waiting-label">Sala creada — comparte el código:</p>
+                    <p class="lobby-waiting-label" data-i18n="online.shareCode">Sala creada — comparte el código:</p>
                     <div class="room-code-display" id="roomCode"></div>
-                    <p class="form-hint" style="text-align:center">Esperando a que alguien se una...</p>
-                    <button class="btn btn-ghost btn-sm" onclick="cancelWait()">Cancelar</button>
+                    <p class="form-hint" style="text-align:center" data-i18n="online.waitingJoin">Esperando a que alguien se una...</p>
+                    <button class="btn btn-ghost btn-sm" onclick="cancelWait()" data-i18n="online.cancel">Cancelar</button>
                 </div>
 
                 <!-- Join form -->
@@ -49,9 +49,9 @@
                                placeholder="ABCD12" maxlength="6"
                                oninput="this.value=this.value.toUpperCase()"
                                onkeydown="if(event.key==='Enter')joinRoom()">
-                        <button class="btn btn-accent" onclick="joinRoom()">Unirse</button>
+                        <button class="btn btn-accent" onclick="joinRoom()" data-i18n="online.join">Unirse</button>
                     </div>
-                    <button class="btn btn-ghost btn-sm" onclick="hideJoin()">Cancelar</button>
+                    <button class="btn btn-ghost btn-sm" onclick="hideJoin()" data-i18n="online.cancel">Cancelar</button>
                 </div>
 
                 <!-- In queue indicator -->
@@ -60,9 +60,9 @@
                         <span class="searching-dot"></span>
                         <span class="searching-dot"></span>
                         <span class="searching-dot"></span>
-                        Buscando oponente...
+                        <span data-i18n="online.searching">Buscando oponente...</span>
                     </div>
-                    <button class="btn btn-ghost btn-sm" onclick="cancelQueue()">Cancelar</button>
+                    <button class="btn btn-ghost btn-sm" onclick="cancelQueue()" data-i18n="online.cancel">Cancelar</button>
                 </div>
             </div>
         </div>
@@ -72,7 +72,7 @@
     <div id="gameSection" style="display:none">
         <div class="score-bar">
             <div class="score-side">
-                <span class="score-name" id="scoreLabelYou">Tú</span>
+                <span class="score-name" id="scoreLabelYou" data-i18n="score.you">Tú</span>
                 <span class="score-num" id="scoreYou">0</span>
             </div>
             <div class="score-center">
@@ -81,23 +81,23 @@
             </div>
             <div class="score-side score-side-right">
                 <span class="score-num" id="scoreOpp">0</span>
-                <span class="score-name" id="scoreLabelOpp">Oponente</span>
+                <span class="score-name" id="scoreLabelOpp" data-i18n="score.opponent">Oponente</span>
             </div>
         </div>
 
         <div class="game-body">
             <div class="container">
                 <div class="clickarea" id="gameArea">
-                    <p class="message" id="gameMsg">Conectando...</p>
+                    <p class="message" id="gameMsg" data-i18n="online.connecting">Conectando...</p>
                     <p class="note" id="gameNote"></p>
 
                     <!-- Match end / rematch actions -->
                     <div id="gameActions" style="display:none; margin-top:28px; display:none">
                         <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center">
-                            <button class="btn btn-outline btn-lg" id="btnRematch" onclick="requestRematch()">
+                            <button class="btn btn-outline btn-lg" id="btnRematch" onclick="requestRematch()" data-i18n="online.rematch">
                                 Revancha
                             </button>
-                            <button class="btn btn-ghost" id="btnDecline" onclick="declineRematch()">
+                            <button class="btn btn-ghost" id="btnDecline" onclick="declineRematch()" data-i18n="online.backToLobby">
                                 Volver al lobby
                             </button>
                         </div>
@@ -108,11 +108,11 @@
 
             <!-- CHAT PANEL -->
             <div class="chat-panel" id="chatPanel">
-                <div class="chat-header">Chat</div>
+                <div class="chat-header" data-i18n="chat.header">Chat</div>
                 <div class="chat-messages" id="chatMessages"></div>
                 <div class="chat-input-row">
                     <input class="chat-input" id="chatInput"
-                           placeholder="Mensaje..."
+                           placeholder="Mensaje..." data-i18n-placeholder="chat.placeholder"
                            maxlength="100"
                            onkeydown="if(event.key==='Enter')sendChat()">
                     <button class="btn btn-sm" onclick="sendChat()">&#x2192;</button>
@@ -123,16 +123,17 @@
 
     <script src="/js/config.js"></script>
     <script src="/js/auth.js"></script>
+    <script src="/js/i18n.js"></script>
     <script src="sfx.js"></script>
     <script>
         const user = AUTH.getUser()
         if (user) {
             document.getElementById('navUser').innerHTML =
                 `<span class="navbar-username">${user.username}</span>
-                 <button class="btn btn-ghost btn-sm" onclick="AUTH.logout()">Salir</button>`
+                 <button class="btn btn-ghost btn-sm" onclick="AUTH.logout()">${I18N.t('nav.logout')}</button>`
         } else {
             document.getElementById('navUser').innerHTML =
-                `<a href="/login/" class="btn btn-sm">Entrar</a>`
+                `<a href="/login/" class="btn btn-sm">${I18N.t('nav.login')}</a>`
         }
     </script>
     <script src="online.js"></script>

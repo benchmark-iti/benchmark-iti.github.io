@@ -5,7 +5,7 @@
     <link rel="icon" type="image/jpeg" href="/assets/stopwatch.png">
     <link rel="stylesheet" href="/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ranking | ranked.ms</title>
+    <title data-i18n="title.ranking">Ranking | ranked.ms</title>
     <style>
         .ranking-page {
             max-width: 540px;
@@ -102,48 +102,49 @@
     <nav class="navbar">
         <a href="/" class="navbar-logo">ranked<span class="dot">.</span>ms</a>
         <div class="navbar-links">
-            <a href="/" class="navbar-link">Inicio</a>
-            <a href="/ranking/" class="navbar-link active">Ranking</a>
-            <a href="/gameplay/" class="navbar-link">Cómo jugar</a>
+            <a href="/" class="navbar-link" data-i18n="nav.home">Inicio</a>
+            <a href="/ranking/" class="navbar-link active" data-i18n="nav.ranking">Ranking</a>
+            <a href="/gameplay/" class="navbar-link" data-i18n="nav.howto">Cómo jugar</a>
         </div>
         <div class="navbar-user" id="navUser"></div>
     </nav>
 
     <div class="ranking-page">
-        <h1>Ranking</h1>
+        <h1 data-i18n="ranking.title">Ranking</h1>
 
         <div class="ranking-tabs">
-            <button class="ranking-tab active" onclick="loadRanking('elo', this)">ELO</button>
-            <button class="ranking-tab" onclick="loadRanking('wins', this)">Victorias</button>
-            <button class="ranking-tab" onclick="loadRanking('times', this)">Tiempo</button>
+            <button class="ranking-tab active" onclick="loadRanking('elo', this)" data-i18n="lb.elo">ELO</button>
+            <button class="ranking-tab" onclick="loadRanking('wins', this)" data-i18n="lb.wins">Victorias</button>
+            <button class="ranking-tab" onclick="loadRanking('times', this)" data-i18n="lb.time">Tiempo</button>
         </div>
         <div class="ranking-list" id="rankingList">
-            <div class="ranking-empty">Cargando...</div>
+            <div class="ranking-empty" data-i18n="lb.loading">Cargando...</div>
         </div>
     </div>
 
     <script src="/js/config.js"></script>
     <script src="/js/auth.js"></script>
+    <script src="/js/i18n.js"></script>
     <script>
         const user = AUTH.getUser()
         if (user) {
             document.getElementById('navUser').innerHTML =
                 `<span class="navbar-username">${user.username}</span>
-                 <button class="btn btn-ghost btn-sm" onclick="AUTH.logout()">Salir</button>`
+                 <button class="btn btn-ghost btn-sm" onclick="AUTH.logout()">${I18N.t('nav.logout')}</button>`
         } else {
             document.getElementById('navUser').innerHTML =
-                `<a href="/login/" class="btn btn-sm">Entrar</a>
-                 <a href="/register/" class="btn btn-sm btn-accent">Registrarse</a>`
+                `<a href="/login/" class="btn btn-sm">${I18N.t('nav.login')}</a>
+                 <a href="/register/" class="btn btn-sm btn-accent">${I18N.t('nav.register')}</a>`
         }
 
-        const suffix = { elo: 'ELO', wins: 'vic.', times: 'ms' }
+        const suffix = () => ({ elo: I18N.t('lb.suffix.elo'), wins: I18N.t('lb.suffix.wins'), times: I18N.t('lb.suffix.times') })
 
         async function loadRanking(type, btn) {
             document.querySelectorAll('.ranking-tab').forEach(t => t.classList.remove('active'))
             if (btn) btn.classList.add('active')
 
             const list = document.getElementById('rankingList')
-            list.innerHTML = '<div class="ranking-empty">Cargando...</div>'
+            list.innerHTML = `<div class="ranking-empty">${I18N.t('lb.loading')}</div>`
 
             try {
                 const res = await fetch(`${CONFIG.backendUrl}/api/leaderboard/${type}`)
@@ -151,18 +152,19 @@
                 const data = await res.json()
 
                 if (!data || !data.length) {
-                    list.innerHTML = '<div class="ranking-empty">Sin datos aún</div>'
+                    list.innerHTML = `<div class="ranking-empty">${I18N.t('lb.empty')}</div>`
                     return
                 }
 
+                const suf = suffix()[type]
                 list.innerHTML = data.map(e => `
                     <div class="ranking-row">
                         <span class="ranking-rank">${e.rank}</span>
                         <span class="ranking-name">${e.username}</span>
-                        <span class="ranking-value">${e.value} ${suffix[type]}</span>
+                        <span class="ranking-value">${e.value} ${suf}</span>
                     </div>`).join('')
             } catch {
-                list.innerHTML = '<div class="ranking-empty">Error al cargar</div>'
+                list.innerHTML = `<div class="ranking-empty">${I18N.t('lb.error')}</div>`
             }
         }
 

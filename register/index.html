@@ -5,41 +5,42 @@
     <link rel="icon" type="image/jpeg" href="/assets/stopwatch.png">
     <link rel="stylesheet" href="/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrarse | ranked.ms</title>
+    <title data-i18n="title.register">Registrarse | ranked.ms</title>
 </head>
 <body>
     <nav class="navbar">
         <a href="/" class="navbar-logo">ranked<span class="dot">.</span>ms</a>
         <div class="navbar-links">
-            <a href="/" class="navbar-link">Inicio</a>
-            <a href="/ranking/" class="navbar-link">Ranking</a>
-            <a href="/gameplay/" class="navbar-link">Cómo jugar</a>
+            <a href="/" class="navbar-link" data-i18n="nav.home">Inicio</a>
+            <a href="/ranking/" class="navbar-link" data-i18n="nav.ranking">Ranking</a>
+            <a href="/gameplay/" class="navbar-link" data-i18n="nav.howto">Cómo jugar</a>
         </div>
     </nav>
 
     <div class="auth-container">
         <div class="auth-card">
-            <h2 class="auth-title">Crear cuenta</h2>
+            <h2 class="auth-title" data-i18n="register.title">Crear cuenta</h2>
             <form id="registerForm">
                 <div class="form-group">
-                    <label class="form-label">Usuario <span class="form-hint">(3–32 caracteres)</span></label>
+                    <label class="form-label"><span data-i18n="form.username">Usuario</span> <span class="form-hint" data-i18n="register.usernameHint">(3–32 caracteres)</span></label>
                     <input class="form-input" type="text" id="username" autocomplete="username" minlength="3" maxlength="32" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Contraseña <span class="form-hint">(mín. 6 caracteres)</span></label>
+                    <label class="form-label"><span data-i18n="form.password">Contraseña</span> <span class="form-hint" data-i18n="register.passwordHint">(mín. 6 caracteres)</span></label>
                     <input class="form-input" type="password" id="password" autocomplete="new-password" minlength="6" required>
                 </div>
                 <p class="form-error" id="errorMsg"></p>
-                <button class="btn btn-block btn-accent" type="submit" id="submitBtn">Registrarse</button>
+                <button class="btn btn-block btn-accent" type="submit" id="submitBtn" data-i18n="register.submit">Registrarse</button>
             </form>
             <p class="auth-footer">
-                ¿Ya tienes cuenta? <a href="/login/">Inicia sesión</a>
+                <span data-i18n="register.haveAccount">¿Ya tienes cuenta?</span> <a href="/login/" data-i18n="register.loginLink">Inicia sesión</a>
             </p>
         </div>
     </div>
 
     <script src="/js/config.js"></script>
     <script src="/js/auth.js"></script>
+    <script src="/js/i18n.js"></script>
     <script>
         if (AUTH.isLoggedIn()) window.location.href = '/'
 
@@ -67,7 +68,7 @@
                 AUTH.save(data.token, data.username)
                 window.location.href = '/'
             } catch {
-                err.textContent = 'Error de conexión'
+                err.textContent = I18N.t('error.connection')
             } finally {
                 btn.disabled = false
             }

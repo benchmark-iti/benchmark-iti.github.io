@@ -5,36 +5,37 @@
     <link rel="icon" type="image/jpeg" href="/assets/stopwatch.png">
     <link rel="stylesheet" href="/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline | ranked.ms</title>
+    <title data-i18n="title.offline">Offline | ranked.ms</title>
 </head>
 <body>
     <nav class="navbar">
         <a href="/" class="navbar-logo">ranked<span class="dot">.</span>ms</a>
         <div class="navbar-links">
-            <a href="/" class="navbar-link">Inicio</a>
-            <a href="/ranking/" class="navbar-link">Ranking</a>
-            <a href="/gameplay/" class="navbar-link">Cómo jugar</a>
+            <a href="/" class="navbar-link" data-i18n="nav.home">Inicio</a>
+            <a href="/ranking/" class="navbar-link" data-i18n="nav.ranking">Ranking</a>
+            <a href="/gameplay/" class="navbar-link" data-i18n="nav.howto">Cómo jugar</a>
         </div>
         <div class="navbar-user" id="navUser"></div>
     </nav>
     <div class="container">
         <div class="clickarea">
-            <p class="message">Modo offline</p>
-            <p class="note">Cuando el recuadro rojo se vuelva verde, haz clic lo más rápido que puedas.<br/>Haz click donde sea para empezar.</p>
+            <p class="message" data-i18n="offline.title">Modo offline</p>
+            <p class="note" data-i18n-html="offline.intro">Cuando el recuadro rojo se vuelva verde, haz clic lo más rápido que puedas.<br/>Haz click donde sea para empezar.</p>
         </div>
     </div>
     <script src="/js/config.js"></script>
     <script src="/js/auth.js"></script>
+    <script src="/js/i18n.js"></script>
     <script>
         const user = AUTH.getUser()
         if (user) {
             document.getElementById('navUser').innerHTML =
                 `<span class="navbar-username">${user.username}</span>
-                 <button class="btn btn-ghost btn-sm" onclick="AUTH.logout()">Salir</button>`
+                 <button class="btn btn-ghost btn-sm" onclick="AUTH.logout()">${I18N.t('nav.logout')}</button>`
         } else {
             document.getElementById('navUser').innerHTML =
-                `<a href="/login/" class="btn btn-sm">Entrar</a>
-                 <a href="/register/" class="btn btn-sm btn-accent">Registrarse</a>`
+                `<a href="/login/" class="btn btn-sm">${I18N.t('nav.login')}</a>
+                 <a href="/register/" class="btn btn-sm btn-accent">${I18N.t('nav.register')}</a>`
         }
     </script>
     <script src="script.js"></script>
