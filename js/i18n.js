@@ -446,6 +446,7 @@ const I18N = (() => {
         const css = `
         .lang-switch {
             display: inline-flex;
+            flex-shrink: 0;
             margin-left: auto;
             margin-right: 14px;
             border: 1px solid var(--border, #1e1e2a);
@@ -470,6 +471,22 @@ const I18N = (() => {
         }
         /* Si hay navbar-user, este ya empuja a la derecha; quitamos el auto del switch */
         .navbar-user ~ .lang-switch, .lang-switch:has(~ .navbar-user) { margin-left: 0; }
+
+        /* Móvil: el navbar va apretado, así que el switch se hace compacto. */
+        @media (max-width: 768px) {
+            .lang-switch { margin-right: 8px; }
+            .lang-opt { padding: 5px 7px; font-size: 10px; letter-spacing: 0.04em; }
+        }
+        @media (max-width: 480px) {
+            /* En pantallas muy chicas apretamos gaps y links para que el
+               navbar (logo + links + switch + usuario) entre en una sola
+               fila sin desbordar. */
+            .navbar { gap: 8px; }
+            .navbar-links { gap: 0; margin-left: 6px; }
+            .navbar-link { padding: 5px 6px; font-size: 12px; }
+            .lang-switch { margin-right: 6px; }
+            .lang-opt { padding: 4px 6px; }
+        }
         `
         const style = document.createElement('style')
         style.id = 'i18n-style'
