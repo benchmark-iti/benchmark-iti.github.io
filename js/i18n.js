@@ -109,6 +109,13 @@ const I18N = (() => {
             'score.you':           'You',
             'score.opponent':      'Opponent',
 
+            // Online unavailable (servers shut down)
+            'online.unavailableTitle':    'Online mode unavailable',
+            'online.unavailableMsg':      'The online servers have been shut down, so ranked 1v1 and accounts are no longer available. You can still play the practice mode.',
+            'online.unavailablePractice': 'Play practice',
+            'index.onlineOff':            'Online unavailable',
+            'lb.archived':                'Rankings are no longer available',
+
             // Online (dynamic, online.js)
             'online.opponentFound':  'Opponent found!',
             'online.connLost':       'Connection lost. Reconnecting...',
@@ -280,6 +287,13 @@ const I18N = (() => {
             'chat.placeholder':    'Mensaje...',
             'score.you':           'Tú',
             'score.opponent':      'Oponente',
+
+            // Online no disponible (servidores cerrados)
+            'online.unavailableTitle':    'Modo online no disponible',
+            'online.unavailableMsg':      'Los servidores online se cerraron, así que el 1v1 clasificatorio y las cuentas ya no están disponibles. Aún puedes jugar el modo práctica.',
+            'online.unavailablePractice': 'Jugar práctica',
+            'index.onlineOff':            'Online no disponible',
+            'lb.archived':                'Los rankings ya no están disponibles',
 
             // Online (dynamic)
             'online.opponentFound':  '¡Oponente encontrado!',

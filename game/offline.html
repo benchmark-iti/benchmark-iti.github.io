@@ -33,9 +33,8 @@
                 `<span class="navbar-username">${user.username}</span>
                  <button class="btn btn-ghost btn-sm" onclick="AUTH.logout()">${I18N.t('nav.logout')}</button>`
         } else {
-            document.getElementById('navUser').innerHTML =
-                `<a href="/login/" class="btn btn-sm">${I18N.t('nav.login')}</a>
-                 <a href="/register/" class="btn btn-sm btn-accent">${I18N.t('nav.register')}</a>`
+            // Las cuentas dependían del backend, que ya no existe: sin login/registro.
+            document.getElementById('navUser').innerHTML = ''
         }
     </script>
     <script src="script.js"></script>

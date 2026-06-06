@@ -18,105 +18,19 @@
         <div class="navbar-user" id="navUser"></div>
     </nav>
 
-    <!-- LOBBY SECTION -->
-    <div id="lobbySection">
-        <div class="lobby-container">
-            <div class="lobby-card">
-                <h2 class="lobby-title" data-i18n="online.lobbyTitle">Online 1v1</h2>
-                <p class="form-error" id="lobbyError"></p>
-
-                <div id="lobbyBtns" class="lobby-options">
-                    <button class="btn btn-accent btn-block btn-lg" onclick="findMatch()" data-i18n="online.findMatch">
-                        Buscar partida aleatoria
-                    </button>
-                    <div class="lobby-divider" data-i18n="online.or">o</div>
-                    <button class="btn btn-block" onclick="createRoom()" data-i18n="online.createRoom">Crear sala privada</button>
-                    <button class="btn btn-block" onclick="showJoin()" data-i18n="online.joinCode">Unirse con código</button>
-                </div>
-
-                <!-- Room created: show code -->
-                <div id="roomCreated" style="display:none">
-                    <p class="lobby-waiting-label" data-i18n="online.shareCode">Sala creada — comparte el código:</p>
-                    <div class="room-code-display" id="roomCode"></div>
-                    <p class="form-hint" style="text-align:center" data-i18n="online.waitingJoin">Esperando a que alguien se una...</p>
-                    <button class="btn btn-ghost btn-sm" onclick="cancelWait()" data-i18n="online.cancel">Cancelar</button>
-                </div>
-
-                <!-- Join form -->
-                <div id="joinPanel" style="display:none">
-                    <div class="join-row">
-                        <input class="form-input" type="text" id="roomCodeInput"
-                               placeholder="ABCD12" maxlength="6"
-                               oninput="this.value=this.value.toUpperCase()"
-                               onkeydown="if(event.key==='Enter')joinRoom()">
-                        <button class="btn btn-accent" onclick="joinRoom()" data-i18n="online.join">Unirse</button>
-                    </div>
-                    <button class="btn btn-ghost btn-sm" onclick="hideJoin()" data-i18n="online.cancel">Cancelar</button>
-                </div>
-
-                <!-- In queue indicator -->
-                <div id="inQueue" style="display:none">
-                    <div class="searching">
-                        <span class="searching-dot"></span>
-                        <span class="searching-dot"></span>
-                        <span class="searching-dot"></span>
-                        <span data-i18n="online.searching">Buscando oponente...</span>
-                    </div>
-                    <button class="btn btn-ghost btn-sm" onclick="cancelQueue()" data-i18n="online.cancel">Cancelar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- GAME SECTION -->
-    <div id="gameSection" style="display:none">
-        <div class="score-bar">
-            <div class="score-side">
-                <span class="score-name" id="scoreLabelYou" data-i18n="score.you">Tú</span>
-                <span class="score-num" id="scoreYou">0</span>
-            </div>
-            <div class="score-center">
-                <span class="score-vs">VS</span>
-                <span class="score-round" id="scoreRound"></span>
-            </div>
-            <div class="score-side score-side-right">
-                <span class="score-num" id="scoreOpp">0</span>
-                <span class="score-name" id="scoreLabelOpp" data-i18n="score.opponent">Oponente</span>
-            </div>
-        </div>
-
-        <div class="game-body">
-            <div class="container">
-                <div class="clickarea" id="gameArea">
-                    <p class="message" id="gameMsg" data-i18n="online.connecting">Conectando...</p>
-                    <p class="note" id="gameNote"></p>
-
-                    <!-- Match end / rematch actions -->
-                    <div id="gameActions" style="display:none; margin-top:28px; display:none">
-                        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center">
-                            <button class="btn btn-outline btn-lg" id="btnRematch" onclick="requestRematch()" data-i18n="online.rematch">
-                                Revancha
-                            </button>
-                            <button class="btn btn-ghost" id="btnDecline" onclick="declineRematch()" data-i18n="online.backToLobby">
-                                Volver al lobby
-                            </button>
-                        </div>
-                        <p class="note" id="rematchNote" style="margin-top:12px"></p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CHAT PANEL -->
-            <div class="chat-panel" id="chatPanel">
-                <div class="chat-header" data-i18n="chat.header">Chat</div>
-                <div class="chat-messages" id="chatMessages"></div>
-                <div class="chat-input-row">
-                    <input class="chat-input" id="chatInput"
-                           placeholder="Mensaje..." data-i18n-placeholder="chat.placeholder"
-                           maxlength="100"
-                           onkeydown="if(event.key==='Enter')sendChat()">
-                    <button class="btn btn-sm" onclick="sendChat()">&#x2192;</button>
-                </div>
+    <!-- ONLINE UNAVAILABLE -->
+    <!-- Los servidores online (backend + WebSocket) fueron dados de baja, así que
+         el modo 1v1 ya no funciona. Mostramos un aviso fijo y enlazamos a la
+         práctica offline, que sigue siendo 100% local. -->
+    <div class="lobby-container">
+        <div class="lobby-card" style="text-align:center">
+            <h2 class="lobby-title" data-i18n="online.unavailableTitle">Modo online no disponible</h2>
+            <p class="form-hint" data-i18n="online.unavailableMsg">
+                Los servidores online se cerraron, así que el 1v1 clasificatorio y las cuentas ya no están disponibles. Aún puedes jugar el modo práctica.
+            </p>
+            <div class="lobby-options" style="margin-top:20px">
+                <a href="/game/offline.html" class="btn btn-accent btn-block btn-lg" data-i18n="online.unavailablePractice">Jugar práctica</a>
+                <a href="/" class="btn btn-block" data-i18n="nav.home">Inicio</a>
             </div>
         </div>
     </div>
@@ -124,18 +38,16 @@
     <script src="/js/config.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/i18n.js"></script>
-    <script src="sfx.js"></script>
     <script>
+        // Las cuentas dependían del backend, que ya no existe: sin login.
         const user = AUTH.getUser()
         if (user) {
             document.getElementById('navUser').innerHTML =
                 `<span class="navbar-username">${user.username}</span>
                  <button class="btn btn-ghost btn-sm" onclick="AUTH.logout()">${I18N.t('nav.logout')}</button>`
         } else {
-            document.getElementById('navUser').innerHTML =
-                `<a href="/login/" class="btn btn-sm">${I18N.t('nav.login')}</a>`
+            document.getElementById('navUser').innerHTML = ''
         }
     </script>
-    <script src="online.js"></script>
 </body>
 </html>
